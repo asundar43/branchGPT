@@ -54,29 +54,6 @@ export function BranchedChat({
   }, [branchConnection]);
 
   useEffect(() => {
-    if (isNewBranch && initialBranchedFromMessageId && messagesData && messagesData.length > 0 && chat?.parentId) {
-      const firstMessage = messagesData[0];
-      if (firstMessage?.id) {
-        fetch('/api/branch-connection', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            mainChatId: chat.parentId,
-            branchChatId: chatId,
-            mainMessageId: initialBranchedFromMessageId,
-            branchMessageId: firstMessage.id,
-          }),
-        }).catch(error => {
-          console.error('Failed to store branch connection:', error);
-          toast.error('Failed to store branch connection');
-        });
-      }
-    }
-  }, [isNewBranch, initialBranchedFromMessageId, messagesData, chatId, chat?.parentId]);
-
-  useEffect(() => {
     if (error) {
       console.error('Failed to fetch chat:', error);
       toast.error('Failed to load chat details');

@@ -14,13 +14,38 @@ export function BranchConnection({ messageId, targetBranchId, color }: BranchCon
       // Find the source message and its AI icon
       const sourceMessage = document.querySelector(`[data-message-id="${messageId}"]`);
       const sourceIcon = sourceMessage?.querySelector('.size-8'); // The AI icon container
+      
+      // Get the source message content - look inside the Markdown component
+      const sourceContent = sourceMessage?.querySelector('.flex.flex-col.gap-4 > div')?.textContent?.trim();
+      console.log('Source content:', sourceContent);
 
-      // Find the specific branch window and its first AI message icon
+      // Find the specific branch window and find the message with matching content
       const branchWindow = document.querySelector(`[data-branch-window="${targetBranchId}"]`);
-      const branchMessage = branchWindow?.querySelector('[data-role="assistant"]');
+      const branchMessages = Array.from(branchWindow?.querySelectorAll('[data-message-id]') || []);
+      console.log('Found branch messages:', branchMessages.length);
+
+      let matchingMessage;
+      if (sourceContent && branchMessages.length > 0) {
+        // Find the message in the branch that matches the source content
+        for (const msg of branchMessages) {
+          const msgContent = msg.querySelector('.flex.flex-col.gap-4 > div')?.textContent?.trim();
+          console.log('Comparing:', msgContent);
+          if (msgContent === sourceContent) {
+            console.log('Found matching message!');
+            matchingMessage = msg;
+            break;
+          }
+        }
+      }
+
+      // If no matching message found, fall back to the first message
+      const branchMessage = matchingMessage || branchWindow?.querySelector('[data-message-id]');
       const branchIcon = branchMessage?.querySelector('.size-8');
 
-      if (!sourceIcon || !branchIcon) return;
+      if (!sourceIcon || !branchIcon) {
+        console.log('Missing icons:', { sourceIcon: !!sourceIcon, branchIcon: !!branchIcon });
+        return;
+      }
 
       const sourceRect = sourceIcon.getBoundingClientRect();
       const branchRect = branchIcon.getBoundingClientRect();
