@@ -114,3 +114,22 @@ export const suggestion = pgTable(
 );
 
 export type Suggestion = InferSelectModel<typeof suggestion>;
+
+export const branchConnection = pgTable('BranchConnection', {
+  id: uuid('id').primaryKey().notNull().defaultRandom(),
+  mainChatId: uuid('mainChatId')
+    .notNull()
+    .references(() => chat.id),
+  branchChatId: uuid('branchChatId')
+    .notNull()
+    .references(() => chat.id),
+  mainMessageId: uuid('mainMessageId')
+    .notNull()
+    .references(() => message.id),
+  branchMessageId: uuid('branchMessageId')
+    .notNull()
+    .references(() => message.id),
+  createdAt: timestamp('createdAt').notNull(),
+});
+
+export type BranchConnection = InferSelectModel<typeof branchConnection>;

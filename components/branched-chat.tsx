@@ -2,7 +2,7 @@ import { useChat, Message } from '@ai-sdk/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useWindowSize } from 'usehooks-ts';
 import { useSidebar } from './ui/sidebar';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Messages } from './messages';
 import { MultimodalInput } from './multimodal-input';
 import { toast } from 'sonner';
@@ -28,19 +28,52 @@ export function BranchedChat({
   onClose, 
   selectedChatModel,
   isNewBranch = false,
-  branchedFromMessageId,
+  branchedFromMessageId: initialBranchedFromMessageId,
   style,
   color
 }: BranchedChatProps) {
   const { width: windowWidth } = useWindowSize();
   const { open: isSidebarOpen } = useSidebar();
   const isMobile = windowWidth ? windowWidth < 768 : false;
+  const [effectiveBranchedFromMessageId, setEffectiveBranchedFromMessageId] = useState<string | undefined>(initialBranchedFromMessageId);
 
   const { data: chat, error } = useSWR<Chat>(`/api/chat?id=${chatId}`, fetcher);
   const { data: messagesData } = useSWR<Array<Message>>(
     `/api/messages?chatId=${chatId}`,
     fetcher,
   );
+  const { data: branchConnection } = useSWR(
+    !isNewBranch ? `/api/branch-connection?branchChatId=${chatId}` : null,
+    fetcher
+  );
+
+  useEffect(() => {
+    if (!isNewBranch && branchConnection) {
+      setEffectiveBranchedFromMessageId(branchConnection.mainMessageId);
+    }
+  }, [isNewBranch, branchConnection]);
+
+  useEffect(() => {
+    if (isNewBranch && initialBranchedFromMessageId && messagesData && messagesData.length > 0) {
+      const firstMessage = messagesData[0];
+      if (firstMessage && firstMessage.id && chat?.parentId) {
+        fetch('/api/branch-connection', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            mainChatId: chat.parentId,
+            branchChatId: chatId,
+            mainMessageId: initialBranchedFromMessageId,
+            branchMessageId: firstMessage.id,
+          }),
+        }).catch(error => {
+          console.error('Failed to store branch connection:', error);
+        });
+      }
+    }
+  }, [isNewBranch, initialBranchedFromMessageId, messagesData, chatId, chat?.parentId]);
 
   useEffect(() => {
     if (error) {
@@ -125,7 +158,7 @@ export function BranchedChat({
           isReadonly={false}
           isArtifactVisible={false}
           showRecommendations={false}
-          branchedFromMessageId={branchedFromMessageId}
+          branchedFromMessageId={effectiveBranchedFromMessageId}
         />
       </div>
 

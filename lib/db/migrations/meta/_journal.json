@@ -36,6 +36,41 @@
       "when": 1733945232355,
       "tag": "0004_odd_slayback",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1742012350733,
+      "tag": "0005_nosy_skrulls",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1742057128305,
+      "tag": "0006_moaning_frog_thor",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1742064978602,
+      "tag": "0007_shallow_mantis",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1742168345762,
+      "tag": "0008_colossal_kingpin",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1742174554233,
+      "tag": "0009_odd_ben_parker",
+      "breakpoints": true
     }
   ]
 }

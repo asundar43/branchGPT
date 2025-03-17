@@ -81,14 +81,27 @@ const PureChatItem = ({
   const { show: showBranchedChat } = useBranchedChat();
   const router = useRouter();
 
-  const handleChatClick = (e: React.MouseEvent) => {
+  const handleChatClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     setOpenMobile(false);
     
     if (chat.parentId) {
       // If it's a branched chat, navigate to parent and show branch
       router.push(`/chat/${chat.parentId}`);
-      showBranchedChat(chat.id);
+      
+      // Fetch the first message of the branched chat to determine where it branched from
+      const response = await fetch(`/api/messages?chatId=${chat.id}`);
+      if (response.ok) {
+        const messages = await response.json();
+        if (messages && messages.length > 0) {
+          // Show branched chat with the first message's ID to establish connection
+          showBranchedChat(chat.id, false, messages[0].id);
+        } else {
+          showBranchedChat(chat.id);
+        }
+      } else {
+        showBranchedChat(chat.id);
+      }
     } else {
       // If it's a main chat, just navigate
       router.push(`/chat/${chat.id}`);
