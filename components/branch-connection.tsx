@@ -74,16 +74,15 @@ export function BranchConnection({ messageId, targetBranchId, color }: BranchCon
       const endX = adjustedX + branchRect.width / 2;
       const endY = branchRect.top + branchRect.height / 2;
 
-      // Find the message text content for height calculation
-      const sourceText = sourceMessage?.querySelector('.flex.flex-col.gap-4');
-      const sourceTextRect = sourceText?.getBoundingClientRect();
+      // Find the message container for height calculation
+      const sourceMessageRect = sourceMessage?.getBoundingClientRect();
       
       // Calculate drop amount to clear all content
-      const textClearance = sourceTextRect 
-        ? (sourceTextRect.bottom - startY) + 20 // Padding below text
-        : 60; // Default drop if no text
+      const textClearance = sourceMessageRect 
+        ? (sourceMessageRect.bottom - startY) + 8 // Reduced padding below message from 20 to 8
+        : 40; // Reduced default drop from 60 to 40
 
-      const cornerRadius = 12; // Slightly larger radius for smoother corners
+      const cornerRadius = 6; // Reduced corner radius from 12 to 6 for tighter corners
       
       // Simple down-right-up path with rounded corners
       const path = `
@@ -157,10 +156,10 @@ export function BranchConnection({ messageId, targetBranchId, color }: BranchCon
         d={path}
         fill="none"
         stroke={color}
-        strokeWidth="1"
-        strokeOpacity="0.6"
-        strokeDasharray="1 2"
-        filter="drop-shadow(0 1px 1px rgb(0 0 0 / 0.03))"
+        strokeWidth="2"
+        strokeOpacity="0.8"
+        strokeDasharray="4 4"
+        filter="drop-shadow(0 2px 3px rgb(0 0 0 / 0.1))"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
