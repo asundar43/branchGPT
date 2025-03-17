@@ -132,10 +132,10 @@ export function BranchConnection({ messageId, targetBranchId, color }: BranchCon
         d={path}
         fill="none"
         stroke={color}
-        strokeWidth="1.5"
-        strokeOpacity="0.8"
-        strokeDasharray="2 3"
-        filter="drop-shadow(0 1px 1px rgb(0 0 0 / 0.05))"
+        strokeWidth="1"
+        strokeOpacity="0.6"
+        strokeDasharray="1 2"
+        filter="drop-shadow(0 1px 1px rgb(0 0 0 / 0.03))"
         strokeLinecap="round"
         strokeLinejoin="round"
       />

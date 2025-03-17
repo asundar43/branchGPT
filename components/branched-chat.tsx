@@ -43,20 +43,20 @@ export function BranchedChat({
     fetcher,
   );
   const { data: branchConnection } = useSWR(
-    !isNewBranch ? `/api/branch-connection?branchChatId=${chatId}` : null,
+    `/api/branch-connection?branchChatId=${chatId}`,
     fetcher
   );
 
   useEffect(() => {
-    if (!isNewBranch && branchConnection) {
+    if (branchConnection?.mainMessageId) {
       setEffectiveBranchedFromMessageId(branchConnection.mainMessageId);
     }
-  }, [isNewBranch, branchConnection]);
+  }, [branchConnection]);
 
   useEffect(() => {
-    if (isNewBranch && initialBranchedFromMessageId && messagesData && messagesData.length > 0) {
+    if (isNewBranch && initialBranchedFromMessageId && messagesData && messagesData.length > 0 && chat?.parentId) {
       const firstMessage = messagesData[0];
-      if (firstMessage && firstMessage.id && chat?.parentId) {
+      if (firstMessage?.id) {
         fetch('/api/branch-connection', {
           method: 'POST',
           headers: {
@@ -70,6 +70,7 @@ export function BranchedChat({
           }),
         }).catch(error => {
           console.error('Failed to store branch connection:', error);
+          toast.error('Failed to store branch connection');
         });
       }
     }

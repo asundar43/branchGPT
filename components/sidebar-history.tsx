@@ -89,12 +89,22 @@ const PureChatItem = ({
       // If it's a branched chat, navigate to parent and show branch
       router.push(`/chat/${chat.parentId}`);
       
-      // Fetch the first message of the branched chat to determine where it branched from
-      const response = await fetch(`/api/messages?chatId=${chat.id}`);
-      if (response.ok) {
-        const messages = await response.json();
+      // First try to get the branch connection data
+      const branchConnectionResponse = await fetch(`/api/branch-connection?branchChatId=${chat.id}`);
+      if (branchConnectionResponse.ok) {
+        const branchConnection = await branchConnectionResponse.json();
+        if (branchConnection?.mainMessageId) {
+          // If we have the branch connection, use its mainMessageId
+          showBranchedChat(chat.id, false, branchConnection.mainMessageId);
+          return;
+        }
+      }
+      
+      // Fallback: fetch messages if no branch connection found
+      const messagesResponse = await fetch(`/api/messages?chatId=${chat.id}`);
+      if (messagesResponse.ok) {
+        const messages = await messagesResponse.json();
         if (messages && messages.length > 0) {
-          // Show branched chat with the first message's ID to establish connection
           showBranchedChat(chat.id, false, messages[0].id);
         } else {
           showBranchedChat(chat.id);

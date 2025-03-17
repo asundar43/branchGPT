@@ -16,15 +16,27 @@ interface BranchedChatState {
 export const useBranchedChat = create<BranchedChatState>((set) => ({
   branches: [],
   addBranch: (chatId: string, isNewBranch = false, branchedFromMessageId?: string) =>
-    set((state) => ({
-      branches: [...state.branches, { chatId, isNewBranch, branchedFromMessageId }],
-    })),
+    set((state) => {
+      // Don't add if branch already exists
+      if (state.branches.some(branch => branch.chatId === chatId)) {
+        return state;
+      }
+      return {
+        branches: [...state.branches, { chatId, isNewBranch, branchedFromMessageId }],
+      };
+    }),
   removeBranch: (chatId: string) =>
     set((state) => ({
       branches: state.branches.filter(branch => branch.chatId !== chatId),
     })),
   show: (chatId: string, isNewBranch = false, branchedFromMessageId?: string) =>
-    set((state) => ({
-      branches: [...state.branches, { chatId, isNewBranch, branchedFromMessageId }],
-    })),
+    set((state) => {
+      // Don't add if branch already exists
+      if (state.branches.some(branch => branch.chatId === chatId)) {
+        return state;
+      }
+      return {
+        branches: [...state.branches, { chatId, isNewBranch, branchedFromMessageId }],
+      };
+    }),
 })); 

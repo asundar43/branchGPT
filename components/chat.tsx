@@ -49,11 +49,26 @@ export function Chat({
   isReadonly: boolean;
 }) {
   const { mutate } = useSWRConfig();
-  const { branches, removeBranch } = useBranchedChat();
+  const { branches, addBranch, removeBranch } = useBranchedChat();
   const isArtifactVisible = useArtifactSelector((state) => state.isVisible);
 
   // Track widths of each panel (main chat + branches)
-  const [panelWidths, setPanelWidths] = useState<number[]>([]);
+  const [panelWidths, setPanelWidths] = useState<number[]>([100]); // Main chat starts at 100%
+
+  // Fetch branch connections for this chat
+  const { data: branchConnections } = useSWR(
+    `/api/branch-connections?mainChatId=${id}`,
+    fetcher
+  );
+
+  // Load branch connections when data is available
+  useEffect(() => {
+    if (branchConnections?.length > 0) {
+      branchConnections.forEach((connection: any) => {
+        addBranch(connection.branchChatId, false, connection.mainMessageId);
+      });
+    }
+  }, [branchConnections, addBranch]);
 
   // Initialize panel widths when branches change
   useEffect(() => {
