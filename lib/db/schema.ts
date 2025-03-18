@@ -129,6 +129,8 @@ export const branchConnection = pgTable('BranchConnection', {
   branchMessageId: uuid('branchMessageId')
     .notNull()
     .references(() => message.id),
+  type: varchar('type', { enum: ['message', 'highlight'] }).notNull().default('message'),
+  selectedText: text('selectedText'),
   createdAt: timestamp('createdAt').notNull(),
 });
 

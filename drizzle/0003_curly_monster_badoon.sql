@@ -1,0 +1,1 @@
+ALTER TABLE "BranchConnection" ALTER COLUMN "type" SET DATA TYPE varchar;

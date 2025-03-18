@@ -4,9 +4,17 @@ interface BranchConnectionProps {
   messageId: string;
   targetBranchId: string;
   color: string;
+  type?: 'message' | 'highlight';
+  selectedText?: string;
 }
 
-export function BranchConnection({ messageId, targetBranchId, color }: BranchConnectionProps) {
+export function BranchConnection({ 
+  messageId, 
+  targetBranchId, 
+  color,
+  type = 'message',
+  selectedText
+}: BranchConnectionProps) {
   const [path, setPath] = useState<string>('');
 
   useEffect(() => {
@@ -25,13 +33,20 @@ export function BranchConnection({ messageId, targetBranchId, color }: BranchCon
       console.log('Found branch messages:', branchMessages.length);
 
       let matchingMessage;
-      if (sourceContent && branchMessages.length > 0) {
-        // Find the message in the branch that matches the source content
+      if (type === 'highlight' && selectedText) {
+        // For highlight branches, find the message containing the selected text
         for (const msg of branchMessages) {
           const msgContent = msg.querySelector('.flex.flex-col.gap-4 > div')?.textContent?.trim();
-          console.log('Comparing:', msgContent);
+          if (msgContent === selectedText) {
+            matchingMessage = msg;
+            break;
+          }
+        }
+      } else if (sourceContent && branchMessages.length > 0) {
+        // For message branches, find the message that matches the source content
+        for (const msg of branchMessages) {
+          const msgContent = msg.querySelector('.flex.flex-col.gap-4 > div')?.textContent?.trim();
           if (msgContent === sourceContent) {
-            console.log('Found matching message!');
             matchingMessage = msg;
             break;
           }
@@ -138,7 +153,7 @@ export function BranchConnection({ messageId, targetBranchId, color }: BranchCon
       clearInterval(interval);
       observer.disconnect();
     };
-  }, [messageId, targetBranchId]);
+  }, [messageId, targetBranchId, type, selectedText]);
 
   if (!path) return null;
 

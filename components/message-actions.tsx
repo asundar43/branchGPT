@@ -59,7 +59,7 @@ function PureMessageActions({
       }
 
       const { chatId: branchedChatId } = await response.json();
-      addBranch(branchedChatId, true, message.id);
+      addBranch(branchedChatId, true, message.id, 'message');
     } catch (error) {
       console.error('Failed to branch chat:', error);
       toast.error('Failed to branch chat');

@@ -3,13 +3,17 @@ import { generateUUID } from '@/lib/utils';
 import { saveChat, saveMessages, getChatById } from '@/lib/db/queries';
 import { Message } from 'ai';
 import { generateTitleFromUserMessage } from '../../actions';
-import { branchConnection, type Message as DBMessage } from '@/lib/db/schema';
+import { branchConnection } from '@/lib/db/schema';
 import { db } from '@/lib/db/index';
 
 export async function POST(request: Request) {
   try {
-    const { messages, messageId, chatId }: { messages: Array<Message>; messageId: string; chatId: string } =
-      await request.json();
+    const { messages, messageId, chatId, selectedText }: { 
+      messages: Array<Message>; 
+      messageId: string; 
+      chatId: string;
+      selectedText?: string;
+    } = await request.json();
 
     const session = await auth();
 
@@ -17,23 +21,22 @@ export async function POST(request: Request) {
       return new Response('Unauthorized', { status: 401 });
     }
 
-    // Find the index of the message to branch from
-    const messageIndex = messages.findIndex((m) => m.id === messageId);
-    if (messageIndex === -1) {
+    // Find the message to branch from
+    const branchMessage = messages.find((m) => m.id === messageId);
+    if (!branchMessage) {
       return new Response('Message not found', { status: 404 });
     }
 
-    // Create a new chat with messages up to the selected message
-    const branchedMessages = messages.slice(0, messageIndex + 1);
     const newChatId = generateUUID();
 
     // Generate a title based on the message we're branching from
-    const branchMessage = messages[messageIndex];
     const title = await generateTitleFromUserMessage({
       message: {
         id: generateUUID(),
         role: 'user',
-        content: `Branch from: ${branchMessage.content}`,
+        content: selectedText 
+          ? `Branch from: "${selectedText}"`
+          : `Branch from: ${branchMessage.content}`,
       },
     });
 
@@ -54,16 +57,24 @@ export async function POST(request: Request) {
       parentId: mainChatId,
     });
 
-    // Save the branched messages
-    const messageIds = branchedMessages.map(() => generateUUID());
+    // Create the initial message for the branch
+    const initialMessageId = generateUUID();
+    const initialMessage: Message = {
+      id: initialMessageId,
+      role: branchMessage.role,
+      content: selectedText || branchMessage.content,
+      createdAt: new Date(),
+    };
+
+    // Save the initial message
     await saveMessages({
-      messages: branchedMessages.map((message, index) => ({
-        id: messageIds[index],
+      messages: [{
+        id: initialMessageId,
         chatId: newChatId,
-        role: message.role,
-        content: message.content,
+        role: initialMessage.role,
+        content: initialMessage.content,
         createdAt: new Date(),
-      })),
+      }],
     });
 
     // Create the branch connection
@@ -71,13 +82,18 @@ export async function POST(request: Request) {
       mainChatId,
       branchChatId: newChatId,
       mainMessageId: messageId,
-      branchMessageId: messageIds[0],
+      branchMessageId: initialMessageId,
+      type: selectedText ? 'highlight' : 'message',
+      selectedText: selectedText || null,
       createdAt: new Date(),
     });
 
     return Response.json({ chatId: newChatId }, { status: 200 });
   } catch (error) {
     console.error('Failed to branch chat:', error);
-    return new Response('Internal Server Error', { status: 500 });
+    return new Response(
+      error instanceof Error ? error.message : 'Internal Server Error',
+      { status: 500 }
+    );
   }
 } 

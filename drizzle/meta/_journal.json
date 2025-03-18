@@ -15,6 +15,20 @@
       "when": 1742179629449,
       "tag": "0001_cute_exiles",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1742309877645,
+      "tag": "0002_bright_valeria_richards",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1742309984485,
+      "tag": "0003_curly_monster_badoon",
+      "breakpoints": true
     }
   ]
 }

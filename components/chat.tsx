@@ -198,6 +198,8 @@ export function Chat({
                   messageId={branch.branchedFromMessageId} 
                   targetBranchId={branch.chatId}
                   color={branchColor}
+                  type={branch.type}
+                  selectedText={branch.selectedText}
                 />
               )}
               <div className="relative" style={{ width: `${panelWidths[index + 1] || 0}%` }}>

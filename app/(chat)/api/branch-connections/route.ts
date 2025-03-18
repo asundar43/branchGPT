@@ -19,13 +19,25 @@ export async function GET(request: Request) {
 
     // Get all branch connections for this main chat
     const connections = await db
-      .select()
+      .select({
+        id: branchConnection.id,
+        mainChatId: branchConnection.mainChatId,
+        branchChatId: branchConnection.branchChatId,
+        mainMessageId: branchConnection.mainMessageId,
+        branchMessageId: branchConnection.branchMessageId,
+        type: branchConnection.type,
+        selectedText: branchConnection.selectedText,
+        createdAt: branchConnection.createdAt,
+      })
       .from(branchConnection)
       .where(eq(branchConnection.mainChatId, mainChatId));
 
     return Response.json(connections);
   } catch (error) {
     console.error('Failed to get branch connections:', error);
-    return new Response('Internal Server Error', { status: 500 });
+    return new Response(
+      error instanceof Error ? error.message : 'Internal Server Error',
+      { status: 500 }
+    );
   }
 } 
