@@ -152,6 +152,18 @@ export function BranchConnection({ messageId, targetBranchId, color }: BranchCon
         zIndex: 1 // Put it on same layer as messages
       }}
     >
+      {/* Blurred background path */}
+      <path
+        d={path}
+        fill="none"
+        stroke={color}
+        strokeWidth="12"
+        strokeOpacity="0.15"
+        filter="blur(8px)"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* Main line path */}
       <path
         d={path}
         fill="none"
