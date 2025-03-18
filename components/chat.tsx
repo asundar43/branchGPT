@@ -83,20 +83,22 @@ export function Chat({
       if (!currentWidths.length) return currentWidths;
 
       const newWidths = [...currentWidths];
-      const totalWidth = newWidths.reduce((sum, width) => sum + width, 0);
       
       // Convert delta to percentage
       const deltaPercent = (delta / window.innerWidth) * 100;
       
-      // Ensure minimum width of 15%
-      const minWidth = 15;
-      const leftNewWidth = newWidths[index] + deltaPercent;
-      const rightNewWidth = newWidths[index + 1] - deltaPercent;
+      // Minimum width for each panel (in percentage)
+      const minWidth = 25; // Increased from 15% to 25% for better readability
+      const maxWidth = 60; // Maximum width to prevent panels from getting too wide
       
-      if (leftNewWidth < minWidth || rightNewWidth < minWidth) return currentWidths;
+      const leftNewWidth = Math.min(maxWidth, Math.max(minWidth, newWidths[index] + deltaPercent));
+      const rightNewWidth = Math.min(maxWidth, Math.max(minWidth, newWidths[index + 1] - deltaPercent));
       
-      newWidths[index] = leftNewWidth;
-      newWidths[index + 1] = rightNewWidth;
+      // Only update if both panels stay within bounds
+      if (leftNewWidth >= minWidth && rightNewWidth >= minWidth) {
+        newWidths[index] = leftNewWidth;
+        newWidths[index + 1] = rightNewWidth;
+      }
       
       return newWidths;
     });
@@ -135,9 +137,9 @@ export function Chat({
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
 
   return (
-    <div className="flex flex-row w-full h-dvh">
+    <div className="flex flex-row w-full h-dvh overflow-x-auto overflow-y-hidden">
       <div 
-        className="flex flex-col min-w-0 bg-background transition-all relative"
+        className="flex flex-col min-w-[450px] bg-background transition-all relative"
         style={{ width: `${panelWidths[0] || 100}%` }}
       >
         <ChatHeader

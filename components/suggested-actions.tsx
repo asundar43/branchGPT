@@ -16,24 +16,24 @@ interface SuggestedActionsProps {
 function PureSuggestedActions({ chatId, append }: SuggestedActionsProps) {
   const suggestedActions = [
     {
-      title: 'What are the advantages',
-      label: 'of using Next.js?',
-      action: 'What are the advantages of using Next.js?',
+      title: 'Learn how to',
+      label: 'use BranchGPT features',
+      action: 'Can you explain the key features of BranchGPT and how to use them effectively?',
     },
     {
-      title: 'Write code to',
-      label: `demonstrate djikstra's algorithm`,
-      action: `Write code to demonstrate djikstra's algorithm`,
+      title: 'Explore different',
+      label: 'approaches to a problem',
+      action: 'I want to explore different approaches to solving a problem. How can I use branching to compare solutions?',
     },
     {
-      title: 'Help me write an essay',
-      label: `about silicon valley`,
-      action: `Help me write an essay about silicon valley`,
+      title: 'Create a focused',
+      label: 'branch from specific text',
+      action: 'How do I create a branch from a specific part of a response to dive deeper into that topic?',
     },
     {
-      title: 'What is the weather',
-      label: 'in San Francisco?',
-      action: 'What is the weather in San Francisco?',
+      title: 'Compare multiple',
+      label: 'solutions side by side',
+      action: 'Can you show me how to use multiple branches to compare different solutions or approaches?',
     },
   ];
 

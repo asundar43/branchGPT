@@ -87,7 +87,7 @@ export function BranchedChat({
   return (
     <motion.div
       data-branch-window={chatId}
-      className="flex flex-col h-full border-l border-border bg-background relative"
+      className="flex flex-col h-full border-l border-border bg-background relative min-w-[450px] max-w-[800px]"
       initial={{ x: '100%', opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: '100%', opacity: 0 }}
@@ -102,15 +102,15 @@ export function BranchedChat({
       }}
     >
       <div className="flex justify-between items-center p-4 border-b bg-background relative z-10">
-        <div className="flex items-center gap-2">
-          <div className="text-muted-foreground" style={{ color }}>
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="text-muted-foreground flex-shrink-0" style={{ color }}>
             <BranchIcon size={14} />
           </div>
-          <div className="flex flex-col">
-            <h2 className="text-sm font-medium">
+          <div className="flex flex-col min-w-0">
+            <h2 className="text-sm font-medium truncate">
               Branched Chat
             </h2>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground truncate">
               {error ? 'Error loading chat' : chat?.title || 'Loading...'}
             </p>
           </div>
@@ -118,36 +118,38 @@ export function BranchedChat({
         <Button
           variant="ghost"
           size="icon"
-          className="h-auto p-0"
+          className="h-auto p-0 flex-shrink-0"
           onClick={onClose}
         >
           <CrossIcon />
         </Button>
       </div>
 
-      <div className="flex-1 overflow-y-scroll">
-        <Messages
-          chatId={chatId}
-          messages={messages}
-          isLoading={isLoading}
-          votes={votes}
-          setMessages={setMessages}
-          reload={reload}
-          isReadonly={false}
-          isArtifactVisible={false}
-          showRecommendations={false}
-          branchedFromMessageId={effectiveBranchedFromMessageId}
-          nextBranchColor={color}
-          highlightInfo={branchConnection?.type === 'highlight' ? {
-            messageId: branchConnection.mainMessageId,
-            selectedText: branchConnection.selectedText || '',
-            color: color
-          } : undefined}
-        />
+      <div className="flex-1 overflow-y-auto overflow-x-hidden">
+        <div className="max-w-[600px] mx-auto">
+          <Messages
+            chatId={chatId}
+            messages={messages}
+            isLoading={isLoading}
+            votes={votes}
+            setMessages={setMessages}
+            reload={reload}
+            isReadonly={false}
+            isArtifactVisible={false}
+            showRecommendations={false}
+            branchedFromMessageId={effectiveBranchedFromMessageId}
+            nextBranchColor={color}
+            highlightInfo={branchConnection?.type === 'highlight' ? {
+              messageId: branchConnection.mainMessageId,
+              selectedText: branchConnection.selectedText || '',
+              color: color
+            } : undefined}
+          />
+        </div>
       </div>
 
       <div className="p-4 border-t bg-background relative z-10">
-        <div className="w-full max-w-3xl mx-auto">
+        <div className="w-full max-w-[600px] mx-auto">
           <MultimodalInput
             chatId={chatId}
             input={input}
