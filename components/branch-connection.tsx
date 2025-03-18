@@ -25,19 +25,17 @@ export function BranchConnection({
       
       // Get the source message content - look inside the Markdown component
       const sourceContent = sourceMessage?.querySelector('.flex.flex-col.gap-4 > div')?.textContent?.trim();
-      console.log('Source content:', sourceContent);
 
       // Find the specific branch window and find the message with matching content
       const branchWindow = document.querySelector(`[data-branch-window="${targetBranchId}"]`);
       const branchMessages = Array.from(branchWindow?.querySelectorAll('[data-message-id]') || []);
-      console.log('Found branch messages:', branchMessages.length);
 
       let matchingMessage;
       if (type === 'highlight' && selectedText) {
         // For highlight branches, find the message containing the selected text
         for (const msg of branchMessages) {
-          const msgContent = msg.querySelector('.flex.flex-col.gap-4 > div')?.textContent?.trim();
-          if (msgContent === selectedText) {
+          const msgContent = msg.querySelector('.flex.flex-col.gap-4 > div')?.textContent;
+          if (msgContent?.includes(selectedText)) {
             matchingMessage = msg;
             break;
           }
@@ -58,7 +56,6 @@ export function BranchConnection({
       const branchIcon = branchMessage?.querySelector('.size-8');
 
       if (!sourceIcon || !branchIcon) {
-        console.log('Missing icons:', { sourceIcon: !!sourceIcon, branchIcon: !!branchIcon });
         return;
       }
 
@@ -94,10 +91,10 @@ export function BranchConnection({
       
       // Calculate drop amount to clear all content
       const textClearance = sourceMessageRect 
-        ? (sourceMessageRect.bottom - startY) + 8 // Reduced padding below message from 20 to 8
-        : 40; // Reduced default drop from 60 to 40
+        ? (sourceMessageRect.bottom - startY) + 8
+        : 40;
 
-      const cornerRadius = 6; // Reduced corner radius from 12 to 6 for tighter corners
+      const cornerRadius = 6;
       
       // Simple down-right-up path with rounded corners
       const path = `
@@ -117,9 +114,9 @@ export function BranchConnection({
     window.addEventListener('resize', updatePath);
     
     // Update path more frequently during animations
-    const interval = setInterval(updatePath, 16); // ~60fps
+    const interval = setInterval(updatePath, 16);
 
-    // Also update on scroll events for both main chat and branch chat
+    // Update on scroll events for both main chat and branch chat
     const scrollHandler = () => {
       requestAnimationFrame(updatePath);
     };
@@ -127,21 +124,36 @@ export function BranchConnection({
       element.addEventListener('scroll', scrollHandler, { passive: true });
     });
 
-    // Create a mutation observer to watch for new messages
+    // Create a mutation observer to watch for new messages and highlights
     const observer = new MutationObserver((mutations) => {
       for (const mutation of mutations) {
-        if (mutation.addedNodes.length > 0) {
+        if (mutation.addedNodes.length > 0 || 
+            mutation.type === 'attributes' || 
+            mutation.type === 'characterData') {
           requestAnimationFrame(updatePath);
         }
       }
     });
 
-    // Start observing the specific branch chat container for new messages
+    // Start observing both main chat and branch chat containers
+    const mainContainer = document.querySelector('.messages-container');
     const branchContainer = document.querySelector(`[data-branch-window="${targetBranchId}"] .overflow-y-scroll`);
+    
+    if (mainContainer) {
+      observer.observe(mainContainer, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        characterData: true
+      });
+    }
+    
     if (branchContainer) {
       observer.observe(branchContainer, {
         childList: true,
-        subtree: true
+        subtree: true,
+        attributes: true,
+        characterData: true
       });
     }
 

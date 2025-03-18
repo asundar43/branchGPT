@@ -158,6 +158,7 @@ export function Chat({
           isReadonly={isReadonly}
           isArtifactVisible={isArtifactVisible}
           branchedFromMessageId={undefined}
+          nextBranchColor={BRANCH_COLORS[branches.length % BRANCH_COLORS.length]}
         />
 
         <form className="flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full relative z-10 border-t shadow-[0_-1px_2px_rgba(0,0,0,0.03)]">

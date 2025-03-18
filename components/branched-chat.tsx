@@ -137,6 +137,12 @@ export function BranchedChat({
           isArtifactVisible={false}
           showRecommendations={false}
           branchedFromMessageId={effectiveBranchedFromMessageId}
+          nextBranchColor={color}
+          highlightInfo={branchConnection?.type === 'highlight' ? {
+            messageId: branchConnection.mainMessageId,
+            selectedText: branchConnection.selectedText || '',
+            color: color
+          } : undefined}
         />
       </div>
 
