@@ -1,10 +1,14 @@
 import { compare } from 'bcrypt-ts';
-import NextAuth, { type User, type Session } from 'next-auth';
+import NextAuth, { type User as NextAuthUser, type Session } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 
 import { getUser } from '@/lib/db/queries';
 
 import { authConfig } from './auth.config';
+
+interface User extends NextAuthUser {
+  isNewUser?: boolean;
+}
 
 interface ExtendedSession extends Session {
   user: User;
@@ -34,6 +38,10 @@ export const {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        // Add a flag to indicate if this is a new user
+        if (!token.isNewUser) {
+          token.isNewUser = true;
+        }
       }
 
       return token;
@@ -47,9 +55,19 @@ export const {
     }) {
       if (session.user) {
         session.user.id = token.id as string;
+        // Add the isNewUser flag to the session
+        session.user.isNewUser = token.isNewUser;
       }
 
       return session;
+    },
+    async redirect({ url, baseUrl }) {
+      // If the url is relative, prefix it with the base URL
+      if (url.startsWith('/')) return `${baseUrl}${url}`;
+      // If the url is external, redirect to the dashboard
+      if (url.startsWith('http')) return `${baseUrl}/chat`;
+      // Default to the dashboard
+      return `${baseUrl}/chat`;
     },
   },
 });

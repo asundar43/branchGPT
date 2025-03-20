@@ -51,7 +51,8 @@ export function SidebarUserNav({ user }: { user: User }) {
             <DropdownMenuItem
               className="cursor-pointer"
               onSelect={() => {
-                window.location.href = 'https://billing.stripe.com/p/login/8wMcNl8m4co78o0aEE';
+                // Remove or replace the line:
+                // window.location.href = 'https://billing.stripe.com/p/login/8wMcNl8m4co78o0aEE';
               }}
             >
               Manage Billing

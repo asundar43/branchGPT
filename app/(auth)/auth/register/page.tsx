@@ -37,15 +37,9 @@ export default function RegisterPage() {
       setIsSuccessful(true);
       toast({ type: 'success', description: 'Account created successfully!' });
       
-      // Redirect to Stripe if URL is provided, otherwise to chat
+      // Redirect to pricing page
       if (state.redirectUrl) {
-        window.location.href = state.redirectUrl;
-      } else {
-        // Wait for the auth state to be updated before redirecting
-        setTimeout(() => {
-          router.push('/chat');
-          router.refresh();
-        }, 500);
+        router.push(state.redirectUrl);
       }
     }
   }, [state, router]);
