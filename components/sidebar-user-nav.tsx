@@ -40,7 +40,8 @@ export function SidebarUserNav({ user }: { user: User }) {
           </DropdownMenuTrigger>
           <DropdownMenuContent
             side="top"
-            className="w-[--radix-popper-anchor-width]"
+            align="start"
+            className="w-[--radix-popper-anchor-width] z-[100]"
           >
             <DropdownMenuItem
               className="cursor-pointer"

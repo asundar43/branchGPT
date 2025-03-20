@@ -36,6 +36,27 @@
       "when": 1742319452072,
       "tag": "0004_glorious_red_hulk",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1742496020757,
+      "tag": "0005_loud_blockbuster",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1742496348362,
+      "tag": "0006_needy_scream",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1742496481876,
+      "tag": "0007_tidy_dazzler",
+      "breakpoints": true
     }
   ]
 }

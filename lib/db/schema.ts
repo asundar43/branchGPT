@@ -9,6 +9,7 @@ import {
   primaryKey,
   foreignKey,
   boolean,
+  pgEnum,
 } from 'drizzle-orm/pg-core';
 
 export const user = pgTable('User', {
@@ -135,3 +136,19 @@ export const branchConnection = pgTable('BranchConnection', {
 });
 
 export type BranchConnection = InferSelectModel<typeof branchConnection>;
+
+export const subscriptionStatusEnum = pgEnum('subscription_status', ['active', 'canceled', 'past_due', 'unpaid']);
+export const subscriptionPlanEnum = pgEnum('subscription_plan', ['monthly', 'annual']);
+
+export const subscriptions = pgTable('subscriptions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  user_id: uuid('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  stripe_customer_id: text('stripe_customer_id').notNull(),
+  stripe_subscription_id: text('stripe_subscription_id').notNull().unique(),
+  plan_type: subscriptionPlanEnum('plan_type').notNull(),
+  status: subscriptionStatusEnum('status').notNull().default('active'),
+  start_date: timestamp('start_date', { withTimezone: true }).notNull(),
+  end_date: timestamp('end_date', { withTimezone: true }),
+  created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});

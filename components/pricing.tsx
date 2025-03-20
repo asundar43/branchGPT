@@ -24,7 +24,7 @@ const tiers = [
     name: 'Monthly',
     id: 'monthly',
     price: { monthly: '$20' },
-    priceId: process.env.NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID!,
+    priceId: process.env.NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID,
     description: 'Flexible monthly access to BranchGPT',
     features,
   },
@@ -32,7 +32,7 @@ const tiers = [
     name: 'Annual',
     id: 'annual',
     price: { monthly: '$16', annual: '$192' },
-    priceId: process.env.NEXT_PUBLIC_STRIPE_ANNUAL_PRICE_ID!,
+    priceId: process.env.NEXT_PUBLIC_STRIPE_ANNUAL_PRICE_ID,
     description: 'Best value for power users',
     features,
   },
@@ -51,6 +51,8 @@ export function Pricing() {
 
     try {
       setIsLoading(true);
+      console.log('Sending request with:', { priceId, userId: session.user.id });
+      
       const response = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: {
@@ -62,17 +64,27 @@ export function Pricing() {
         }),
       });
 
-      const { sessionId } = await response.json();
+      const data = await response.json();
+      console.log('Server response:', { status: response.status, data });
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create checkout session');
+      }
+
+      if (!data.sessionId) {
+        throw new Error('No session ID received from server');
+      }
+
       const stripe = await stripePromise;
 
       if (!stripe) throw new Error('Stripe failed to initialize');
 
       const { error } = await stripe.redirectToCheckout({
-        sessionId,
+        sessionId: data.sessionId,
       });
 
       if (error) {
-        console.error('Error:', error);
+        console.error('Stripe redirect error:', error);
         setIsLoading(false);
       }
     } catch (error) {
@@ -180,7 +192,11 @@ export function Pricing() {
                     variant={tier.id === 'annual' && isAnnual || tier.id === 'monthly' && !isAnnual ? 'default' : 'outline'}
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleSubscribe(tier.priceId);
+                      if (tier.priceId) {
+                        handleSubscribe(tier.priceId);
+                      } else {
+                        console.error('Price ID not found for tier:', tier.id);
+                      }
                     }}
                     disabled={isLoading || !session?.user?.id}
                   >
