@@ -4,6 +4,7 @@ import Image from 'next/image';
 import type { User } from 'next-auth';
 import { signOut } from 'next-auth/react';
 import { useTheme } from 'next-themes';
+import { toast } from 'sonner';
 
 import {
   DropdownMenu,
@@ -41,7 +42,7 @@ export function SidebarUserNav({ user }: { user: User }) {
           <DropdownMenuContent
             side="top"
             align="start"
-            className="w-[--radix-popper-anchor-width] z-[100]"
+            className="w-[--radix-popper-anchor-width] z-[9999]"
           >
             <DropdownMenuItem
               className="cursor-pointer"
@@ -51,9 +52,37 @@ export function SidebarUserNav({ user }: { user: User }) {
             </DropdownMenuItem>
             <DropdownMenuItem
               className="cursor-pointer"
-              onSelect={() => {
-                // Remove or replace the line:
-                // window.location.href = 'https://billing.stripe.com/p/login/8wMcNl8m4co78o0aEE';
+              onSelect={async () => {
+                try {
+                  console.log('Creating portal session for user:', user.id);
+                  const response = await fetch('/api/create-portal-session', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                      userId: user.id,
+                    }),
+                  });
+
+                  const data = await response.json();
+                  console.log('Portal session response:', data);
+
+                  if (!response.ok) {
+                    throw new Error(data.error || 'Failed to create portal session');
+                  }
+
+                  if (data.url) {
+                    console.log('Redirecting to portal URL:', data.url);
+                    window.location.href = data.url;
+                  } else {
+                    throw new Error('No portal URL received');
+                  }
+                } catch (error) {
+                  console.error('Error creating portal session:', error);
+                  // Show error toast
+                  toast.error('Failed to open billing portal. Please try again.');
+                }
               }}
             >
               Manage Billing

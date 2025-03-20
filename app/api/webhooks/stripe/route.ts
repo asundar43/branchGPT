@@ -40,19 +40,16 @@ export async function POST(req: Request) {
         // Get the subscription details
         const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
         
-        // Determine plan type from the price ID
-        const priceId = subscription.items.data[0].price.id;
-        const planType = priceId === process.env.STRIPE_MONTHLY_PRICE_ID ? 'monthly' : 'annual';
-
         // Insert subscription record
         await db.insert(subscriptions).values({
           user_id: userId,
           stripe_customer_id: session.customer as string,
           stripe_subscription_id: subscription.id,
-          plan_type: planType,
-          status: 'active',
-          start_date: new Date(subscription.current_period_start * 1000),
-          end_date: subscription.current_period_end ? new Date(subscription.current_period_end * 1000) : null,
+          stripe_price_id: subscription.items.data[0].price.id,
+          status: subscription.status,
+          current_period_start: new Date(subscription.current_period_start * 1000),
+          current_period_end: new Date(subscription.current_period_end * 1000),
+          cancel_at_period_end: subscription.cancel_at_period_end,
         });
 
         console.log('Checkout completed for user:', userId);
@@ -66,8 +63,10 @@ export async function POST(req: Request) {
         await db
           .update(subscriptions)
           .set({
-            status: subscription.status as 'active' | 'canceled' | 'past_due' | 'unpaid',
-            end_date: subscription.current_period_end ? new Date(subscription.current_period_end * 1000) : null,
+            status: subscription.status,
+            current_period_start: new Date(subscription.current_period_start * 1000),
+            current_period_end: new Date(subscription.current_period_end * 1000),
+            cancel_at_period_end: subscription.cancel_at_period_end,
           })
           .where(eq(subscriptions.stripe_subscription_id, subscription.id));
 
@@ -83,7 +82,8 @@ export async function POST(req: Request) {
           .update(subscriptions)
           .set({
             status: 'canceled',
-            end_date: new Date(subscription.current_period_end * 1000),
+            current_period_end: new Date(subscription.current_period_end * 1000),
+            cancel_at_period_end: true,
           })
           .where(eq(subscriptions.stripe_subscription_id, subscription.id));
 

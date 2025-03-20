@@ -142,13 +142,14 @@ export const subscriptionPlanEnum = pgEnum('subscription_plan', ['monthly', 'ann
 
 export const subscriptions = pgTable('subscriptions', {
   id: uuid('id').primaryKey().defaultRandom(),
-  user_id: uuid('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  user_id: text('user_id').notNull(),
   stripe_customer_id: text('stripe_customer_id').notNull(),
-  stripe_subscription_id: text('stripe_subscription_id').notNull().unique(),
-  plan_type: subscriptionPlanEnum('plan_type').notNull(),
-  status: subscriptionStatusEnum('status').notNull().default('active'),
-  start_date: timestamp('start_date', { withTimezone: true }).notNull(),
-  end_date: timestamp('end_date', { withTimezone: true }),
-  created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  stripe_subscription_id: text('stripe_subscription_id').notNull(),
+  stripe_price_id: text('stripe_price_id').notNull(),
+  status: text('status').notNull(),
+  current_period_start: timestamp('current_period_start').notNull(),
+  current_period_end: timestamp('current_period_end').notNull(),
+  cancel_at_period_end: boolean('cancel_at_period_end').notNull().default(false),
+  created_at: timestamp('created_at').notNull().defaultNow(),
+  updated_at: timestamp('updated_at').notNull().defaultNow(),
 });
