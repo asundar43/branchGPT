@@ -84,3 +84,7 @@ export const register = async (
     return { status: 'failed' };
   }
 };
+
+export async function handleGoogleSignIn() {
+  return signIn('google', { callbackUrl: '/chat' });
+}

@@ -1,6 +1,7 @@
 import { compare } from 'bcrypt-ts';
 import NextAuth, { type User as NextAuthUser, type Session } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
+import Google from 'next-auth/providers/google';
 
 import { getUser } from '@/lib/db/queries';
 
@@ -22,6 +23,10 @@ export const {
 } = NextAuth({
   ...authConfig,
   providers: [
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
     Credentials({
       credentials: {},
       async authorize({ email, password }: any) {
