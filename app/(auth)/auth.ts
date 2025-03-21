@@ -2,8 +2,9 @@ import { compare } from 'bcrypt-ts';
 import NextAuth, { type User as NextAuthUser, type Session } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import Google from 'next-auth/providers/google';
+import { generateId } from 'ai';
 
-import { getUser } from '@/lib/db/queries';
+import { getUser, createUser } from '@/lib/db/queries';
 
 import { authConfig } from './auth.config';
 
@@ -40,7 +41,7 @@ export const {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
         // Add a flag to indicate if this is a new user
@@ -73,6 +74,21 @@ export const {
       if (url.startsWith('http')) return `${baseUrl}/chat`;
       // Default to the dashboard
       return `${baseUrl}/chat`;
+    },
+    async signIn({ user, account }) {
+      // If signing in with Google
+      if (account?.provider === 'google') {
+        const users = await getUser(user.email!);
+        // If user doesn't exist in our database, create them
+        if (users.length === 0) {
+          // Create a random password for Google users (they won't use it)
+          const randomPassword = generateId(32);
+          await createUser(user.email!, randomPassword);
+          // Redirect to pricing page
+          return '/pricing';
+        }
+      }
+      return true;
     },
   },
 });

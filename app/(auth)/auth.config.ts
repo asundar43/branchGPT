@@ -3,7 +3,8 @@ import type { NextAuthConfig } from 'next-auth';
 export const authConfig = {
   pages: {
     signIn: '/auth/login',
-    newUser: '/auth/register',
+    newUser: '/pricing',
+    error: '/auth/error',
   },
   providers: [
     // added later in auth.ts since it requires bcrypt which is only compatible with Node.js
