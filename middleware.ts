@@ -32,11 +32,26 @@ export async function middleware(request: NextRequest) {
 
   response.headers.set('Content-Security-Policy', cspHeader);
 
-  const token = await getToken({ req: request });
+  if (!process.env.AUTH_SECRET) {
+    console.error('AUTH_SECRET is not set');
+    return NextResponse.redirect(new URL('/auth/error', request.url));
+  }
+
+  const token = await getToken({ 
+    req: request,
+    secret: process.env.AUTH_SECRET
+  });
+  
   const { pathname } = request.nextUrl;
   
-  // Only check subscription for chat routes
-  if ((pathname.startsWith('/chat') || pathname.startsWith('/api/chat')) && token) {
+  // Check subscription for chat routes
+  if (pathname.startsWith('/chat') || pathname.startsWith('/api/chat')) {
+    // If not authenticated, let NextAuth handle the redirect
+    if (!token) {
+      return NextResponse.redirect(new URL('/auth/login', request.url));
+    }
+
+    // Check subscription status for all authenticated users
     try {
       const hasSubscription = await hasActiveSubscription(token.sub as string);
       if (!hasSubscription) {
@@ -44,7 +59,8 @@ export async function middleware(request: NextRequest) {
       }
     } catch (error) {
       console.error('Error checking subscription:', error);
-      return response;
+      // On error, redirect to pricing to be safe
+      return NextResponse.redirect(new URL('/pricing', request.url));
     }
   }
 
