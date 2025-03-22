@@ -1,14 +1,35 @@
 import { auth } from '@/app/(auth)/auth';
-import { startFreeTrial, checkFreeTrialStatus } from '@/lib/db/queries';
+import { startFreeTrial, checkFreeTrialStatus, getUser } from '@/lib/db/queries';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
     const session = await auth();
-    const userId = session?.user?.id;
+    console.log('Session:', session); // Debug log
+
+    if (!session?.user?.email) {
+      console.error('No user email in session');
+      return NextResponse.json(
+        { error: 'Authentication error' },
+        { status: 401 }
+      );
+    }
+
+    // Get user ID from email since Google OAuth might not have ID set yet
+    const users = await getUser(session.user.email);
+    if (users.length === 0) {
+      console.error('No user found for email:', session.user.email);
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      );
+    }
+
+    const userId = users[0].id;
+    console.log('Found user ID:', userId); // Debug log
 
     // Check if user already has an active trial
-    const trialStatus = await checkFreeTrialStatus(userId!);
+    const trialStatus = await checkFreeTrialStatus(userId);
     if (trialStatus.isActive) {
       return NextResponse.json(
         { error: 'You already have an active free trial' },
@@ -17,7 +38,7 @@ export async function POST(request: Request) {
     }
 
     try {
-      await startFreeTrial(userId!);
+      await startFreeTrial(userId);
       return NextResponse.json({ success: true });
     } catch (error) {
       if (error instanceof Error && error.message.includes('active paid subscription')) {
