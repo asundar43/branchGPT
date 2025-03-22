@@ -65,34 +65,43 @@ export const {
     async signIn({ user, account }) {
       // For Google sign-in, create user if they don't exist
       if (account?.provider === 'google') {
-        const users = await getUser(user.email!);
-        if (users.length === 0) {
-          const randomPassword = generateId(32);
-          await createUser(user.email!, randomPassword);
-          // Start free trial for new users
-          const newUsers = await getUser(user.email!);
-          if (newUsers.length > 0) {
-            await startFreeTrial(newUsers[0].id);
-          }
-        }
-        // Check subscription status for Google users
         try {
-          const existingUser = await getUser(user.email!);
-          if (existingUser.length > 0) {
-            const hasSubscription = await hasActiveSubscription(existingUser[0].id);
-            if (!hasSubscription) {
-              const trialStatus = await checkFreeTrialStatus(existingUser[0].id);
-              if (!trialStatus.isActive) {
-                return '/pricing';
-              }
+          const users = await getUser(user.email!);
+          
+          // Create new user if they don't exist
+          if (users.length === 0) {
+            const randomPassword = generateId(32);
+            await createUser(user.email!, randomPassword);
+            
+            // Get the newly created user
+            const newUsers = await getUser(user.email!);
+            if (newUsers.length > 0) {
+              // Start free trial for new users
+              await startFreeTrial(newUsers[0].id);
+              return true; // Allow sign in and redirect to chat
             }
           }
+          
+          // For existing users, check subscription status
+          const existingUser = users[0];
+          const hasSubscription = await hasActiveSubscription(existingUser.id);
+          
+          if (!hasSubscription) {
+            const trialStatus = await checkFreeTrialStatus(existingUser.id);
+            if (!trialStatus.isActive) {
+              // If no active subscription or trial, allow sign in but redirect to pricing
+              return '/pricing';
+            }
+          }
+          
+          return true; // Allow sign in and use default redirect
         } catch (error) {
-          console.error('Error checking subscription:', error);
-          return '/pricing';
+          console.error('Error in Google sign-in:', error);
+          return '/pricing'; // On error, redirect to pricing
         }
       }
-      return true;
+      
+      return true; // Allow sign in for other providers
     },
   },
 });
