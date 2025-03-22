@@ -4,7 +4,7 @@ import Stripe from 'stripe';
 
 import { stripe } from '@/lib/stripe';
 import { db } from '@/lib/db';
-import { subscriptions } from '@/lib/db/schema';
+import { subscriptions, user } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -69,6 +69,17 @@ export async function POST(req: Request) {
             cancelAtPeriodEnd: subscription.cancel_at_period_end,
           });
 
+          // Clear free trial data
+          await db
+            .update(user)
+            .set({
+              freeTrialStartDate: null,
+              freeTrialEndDate: null,
+              chatCount: 0,
+              lastChatReset: new Date(),
+            })
+            .where(eq(user.id, userId));
+
           console.log('Checkout completed for user:', userId, 'with status:', status);
         } catch (error) {
           console.error('Error processing checkout.session.completed:', error);
@@ -95,6 +106,26 @@ export async function POST(req: Request) {
               updatedAt: new Date(),
             })
             .where(eq(subscriptions.stripeSubscriptionId, subscription.id));
+
+          // If subscription is active, ensure free trial data is cleared
+          if (status === 'active') {
+            const [subscriptionRecord] = await db
+              .select({ userId: subscriptions.userId })
+              .from(subscriptions)
+              .where(eq(subscriptions.stripeSubscriptionId, subscription.id));
+
+            if (subscriptionRecord) {
+              await db
+                .update(user)
+                .set({
+                  freeTrialStartDate: null,
+                  freeTrialEndDate: null,
+                  chatCount: 0,
+                  lastChatReset: new Date(),
+                })
+                .where(eq(user.id, subscriptionRecord.userId));
+            }
+          }
 
           console.log('Subscription updated:', subscription.id, 'with status:', status);
         } catch (error) {
