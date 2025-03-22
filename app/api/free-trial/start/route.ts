@@ -19,9 +19,18 @@ export async function POST(request: Request) {
       );
     }
 
-    await startFreeTrial(session.user.id);
-
-    return NextResponse.json({ success: true });
+    try {
+      await startFreeTrial(session.user.id);
+      return NextResponse.json({ success: true });
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('active paid subscription')) {
+        return NextResponse.json(
+          { error: 'You already have an active paid subscription' },
+          { status: 400 }
+        );
+      }
+      throw error;
+    }
   } catch (error) {
     console.error('Error starting free trial:', error);
     return NextResponse.json(

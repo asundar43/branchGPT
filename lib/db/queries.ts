@@ -378,6 +378,12 @@ export async function hasActiveSubscription(userId: string): Promise<boolean> {
 
 export async function startFreeTrial(userId: string) {
   try {
+    // Check if user has an active paid subscription
+    const hasSubscription = await hasActiveSubscription(userId);
+    if (hasSubscription) {
+      throw new Error('Cannot start free trial while having an active paid subscription');
+    }
+
     const startDate = new Date();
     const endDate = new Date(startDate);
     endDate.setDate(endDate.getDate() + 14); // 14-day trial

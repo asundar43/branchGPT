@@ -20,12 +20,13 @@ export async function POST(req: Request) {
 
     // Get the user's subscription
     console.log('Looking up subscription for user:', userId);
-    const userSubscription = await db.query.subscriptions.findFirst({
-      where: eq(subscriptions.user_id, userId),
-      columns: {
-        stripe_customer_id: true,
-      },
-    });
+    const [userSubscription] = await db
+      .select({
+        stripe_customer_id: subscriptions.stripeCustomerId,
+      })
+      .from(subscriptions)
+      .where(eq(subscriptions.userId, userId))
+      .limit(1);
 
     if (!userSubscription) {
       console.log('No subscription found for user:', userId);

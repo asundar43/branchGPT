@@ -135,6 +135,14 @@ export function Pricing() {
       const data = await response.json();
 
       if (!response.ok) {
+        if (data.error === 'You already have an active paid subscription') {
+          toast({
+            type: 'error',
+            description: 'You already have an active paid subscription. Please use your subscription features.',
+          });
+          router.push('/chat');
+          return;
+        }
         throw new Error(data.error || 'Failed to start free trial');
       }
 

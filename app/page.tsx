@@ -255,7 +255,7 @@ export default function LandingPage() {
               }
             ].map((testimonial, i) => (
               <div key={i} className="p-8 rounded-3xl bg-white/5 backdrop-blur-lg border border-white/10">
-                <p className="text-neutral-400 mb-6">"{testimonial.quote}"</p>
+                <p className="text-neutral-400 mb-6">&ldquo;{testimonial.quote}&rdquo;</p>
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-500" />
                   <div>
