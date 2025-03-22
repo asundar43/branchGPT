@@ -91,22 +91,12 @@ export const {
       if (account?.provider === 'google') {
         const users = await getUser(user.email!);
         if (users.length === 0) {
+          // Create new user but don't redirect yet
           const randomPassword = generateId(32);
           await createUser(user.email!, randomPassword);
-          return '/pricing';
         }
-        
-        // Check subscription for existing Google users
-        try {
-          const hasSubscription = await hasActiveSubscription(users[0].id);
-          if (!hasSubscription) {
-            return '/pricing';
-          }
-          return '/chat';
-        } catch (error) {
-          console.error('Error checking subscription:', error);
-          return '/pricing';
-        }
+        // Let the user authenticate first, then handle subscription in redirect
+        return true;
       }
       return true;
     },
