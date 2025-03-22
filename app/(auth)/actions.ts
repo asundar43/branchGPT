@@ -74,7 +74,22 @@ export const register = async (
       redirect: false,
     });
 
-    // Redirect to pricing page after successful registration
+    // Check subscription status before redirecting
+    const response = await fetch('/api/free-trial');
+    const trialStatus = await response.json();
+    
+    if (trialStatus.isActive) {
+      return { status: 'success', redirectUrl: '/chat' };
+    }
+
+    const subscriptionResponse = await fetch('/api/subscription');
+    const subscriptionData = await subscriptionResponse.json();
+    
+    if (subscriptionData.hasActiveSubscription) {
+      return { status: 'success', redirectUrl: '/chat' };
+    }
+
+    // If no active subscription or trial, redirect to pricing
     return { status: 'success', redirectUrl: '/pricing' };
   } catch (error) {
     if (error instanceof z.ZodError) {
