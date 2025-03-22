@@ -38,7 +38,11 @@ export async function middleware(request: NextRequest) {
   // Handle post-subscription success redirect
   if (pathname === '/chat' && searchParams.get('success') === 'true') {
     if (!token) {
-      return NextResponse.redirect(new URL('/api/auth/signin', request.url));
+      // Store the intended destination
+      const callbackUrl = new URL('/chat', request.url).toString();
+      const signinUrl = new URL('/login', request.url);
+      signinUrl.searchParams.set('callbackUrl', callbackUrl);
+      return NextResponse.redirect(signinUrl);
     }
     return response; // Allow through to chat after successful subscription
   }
@@ -46,8 +50,11 @@ export async function middleware(request: NextRequest) {
   // Protected routes check
   if (pathname.startsWith('/chat') || pathname.startsWith('/api/chat') || pathname.startsWith('/settings')) {
     if (!token) {
-      // User not logged in - redirect to sign in
-      return NextResponse.redirect(new URL('/api/auth/signin', request.url));
+      // Store the intended destination
+      const callbackUrl = new URL(request.url).toString();
+      const signinUrl = new URL('/login', request.url);
+      signinUrl.searchParams.set('callbackUrl', callbackUrl);
+      return NextResponse.redirect(signinUrl);
     }
 
     // For chat routes, check subscription
