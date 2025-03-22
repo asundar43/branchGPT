@@ -80,9 +80,15 @@ export async function POST(request: Request) {
     }
 
     // Check for active subscription
-    const hasSubscription = await hasActiveSubscription(session.user.id);
-    if (!hasSubscription) {
-      return new Response('Subscription required', { status: 403 });
+    try {
+      const hasSubscription = await hasActiveSubscription(session.user.id);
+      if (!hasSubscription) {
+        return new Response('Subscription required', { status: 403 });
+      }
+    } catch (error) {
+      console.error('Error checking subscription:', error);
+      // If there's an error checking subscription, allow the request to prevent blocking access
+      // This is a safety measure to prevent users from being locked out
     }
 
     const userMessage = getMostRecentUserMessage(messages);
@@ -173,11 +179,15 @@ export async function POST(request: Request) {
         });
       },
       onError: () => {
-        return 'Oops, an error occured!';
+        return 'Oops, an error occurred!';
       },
     });
   } catch (error) {
-    return NextResponse.json({ error }, { status: 400 });
+    console.error('Chat API error:', error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'An error occurred' },
+      { status: 500 }
+    );
   }
 }
 

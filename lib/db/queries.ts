@@ -358,7 +358,6 @@ export async function updateChatVisiblityById({
 
 export async function hasActiveSubscription(userId: string): Promise<boolean> {
   try {
-    const now = new Date();
     const userSubscriptions = await db
       .select()
       .from(subscriptions)
@@ -366,27 +365,14 @@ export async function hasActiveSubscription(userId: string): Promise<boolean> {
         and(
           eq(subscriptions.user_id, userId),
           eq(subscriptions.status, 'active'),
-          gt(subscriptions.current_period_end, now)
+          gt(subscriptions.current_period_end, new Date())
         )
       );
     
     return userSubscriptions.length > 0;
   } catch (error) {
     console.error('Failed to check subscription status:', error);
+    // If there's an error checking the subscription, return false to be safe
     return false;
-  }
-}
-
-export async function getSubscriptionDetails(userId: string) {
-  try {
-    const userSubscriptions = await db
-      .select()
-      .from(subscriptions)
-      .where(eq(subscriptions.user_id, userId));
-    
-    return userSubscriptions;
-  } catch (error) {
-    console.error('Failed to get subscription details:', error);
-    return [];
   }
 }
