@@ -146,7 +146,7 @@ export const subscriptions = pgTable('subscriptions', {
   stripe_customer_id: text('stripe_customer_id').notNull(),
   stripe_subscription_id: text('stripe_subscription_id').notNull(),
   stripe_price_id: text('stripe_price_id').notNull(),
-  status: text('status').notNull(),
+  status: subscriptionStatusEnum('status').notNull(),
   current_period_start: timestamp('current_period_start').notNull(),
   current_period_end: timestamp('current_period_end').notNull(),
   cancel_at_period_end: boolean('cancel_at_period_end').notNull().default(false),

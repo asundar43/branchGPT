@@ -358,6 +358,8 @@ export async function updateChatVisiblityById({
 
 export async function hasActiveSubscription(userId: string): Promise<boolean> {
   try {
+    console.log('Checking subscription for user:', userId);
+    
     const userSubscriptions = await db
       .select()
       .from(subscriptions)
@@ -369,7 +371,19 @@ export async function hasActiveSubscription(userId: string): Promise<boolean> {
         )
       );
     
-    return userSubscriptions.length > 0;
+    const hasActive = userSubscriptions.length > 0;
+    console.log('Subscription check result:', {
+      userId,
+      hasActive,
+      subscriptionCount: userSubscriptions.length,
+      subscriptions: userSubscriptions.map(s => ({
+        id: s.id,
+        status: s.status,
+        periodEnd: s.current_period_end
+      }))
+    });
+    
+    return hasActive;
   } catch (error) {
     console.error('Failed to check subscription status:', error);
     // If there's an error checking the subscription, return false to be safe
