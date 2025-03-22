@@ -1,26 +1,13 @@
-import NextAuth from 'next-auth';
 import { NextResponse } from 'next/server';
-import { auth } from '@/app/(auth)/auth';
-import { hasActiveSubscription } from '@/lib/db/queries';
-import { getToken } from 'next-auth/jwt';
 import type { NextRequest } from 'next/server';
-
-import { authConfig } from '@/app/(auth)/auth.config';
-
-export default NextAuth(authConfig).auth;
+import { getToken } from 'next-auth/jwt';
+import { hasActiveSubscription } from '@/lib/db/queries';
 
 export const config = {
   matcher: [
-    // Protected routes that require authentication
     '/chat/:path*',
     '/api/chat/:path*',
     '/settings/:path*',
-    
-    // Exclude the following routes from authentication:
-    // '/' - Landing page
-    // '/auth/login' - Login page
-    // '/auth/register' - Registration page
-    // Add other protected routes here, but NOT the landing page
   ],
 };
 
@@ -45,17 +32,25 @@ export async function middleware(request: NextRequest) {
 
   response.headers.set('Content-Security-Policy', cspHeader);
 
-  // Continue with existing middleware logic
-  if (request.nextUrl.pathname.startsWith('/chat')) {
-    const token = await getToken({ req: request });
-    
-    if (!token) {
-      return NextResponse.redirect(new URL('/auth/signin', request.url));
-    }
+  // Check authentication and subscription
+  const token = await getToken({ req: request });
+  
+  if (!token) {
+    // Let NextAuth handle the authentication redirect
+    return NextResponse.redirect(new URL('/', request.url));
+  }
 
-    const hasSubscription = await hasActiveSubscription(token.sub as string);
-    if (!hasSubscription) {
-      return NextResponse.redirect(new URL('/pricing', request.url));
+  // Only check subscription for chat routes
+  if (request.nextUrl.pathname.startsWith('/chat')) {
+    try {
+      const hasSubscription = await hasActiveSubscription(token.sub as string);
+      if (!hasSubscription) {
+        return NextResponse.redirect(new URL('/pricing', request.url));
+      }
+    } catch (error) {
+      console.error('Error checking subscription:', error);
+      // On error, allow access to prevent infinite redirects
+      return response;
     }
   }
 
