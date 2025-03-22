@@ -12,6 +12,9 @@ import {
   saveChat,
   saveMessages,
   hasActiveSubscription,
+  checkFreeTrialStatus,
+  incrementChatCount,
+  isAllowedModel,
 } from '@/lib/db/queries';
 import {
   generateUUID,
@@ -79,16 +82,56 @@ export async function POST(request: Request) {
       return new Response('Unauthorized', { status: 401 });
     }
 
-    // Check for active subscription
+    // Check if model is allowed for free trial
+    const isModelAllowed = await isAllowedModel(selectedChatModel);
+    if (!isModelAllowed) {
+      return new Response(
+        JSON.stringify({
+          error: 'This model is not available in the free trial',
+          redirect: '/pricing',
+        }),
+        { status: 403 }
+      );
+    }
+
+    // Check subscription and free trial status
     try {
       const hasSubscription = await hasActiveSubscription(session.user.id);
       if (!hasSubscription) {
-        return new Response('Subscription required', { status: 403 });
+        const trialStatus = await checkFreeTrialStatus(session.user.id);
+        
+        if (!trialStatus.isActive) {
+          return new Response(
+            JSON.stringify({
+              error: 'Free trial required',
+              redirect: '/pricing',
+            }),
+            { status: 403 }
+          );
+        }
+
+        if (trialStatus.chatsRemaining <= 0) {
+          return new Response(
+            JSON.stringify({
+              error: 'Rate limit exceeded. Please try again later.',
+              redirect: '/pricing',
+            }),
+            { status: 429 }
+          );
+        }
+
+        // Increment chat count for free trial users
+        await incrementChatCount(session.user.id);
       }
     } catch (error) {
       console.error('Error checking subscription:', error);
-      // If there's an error checking subscription, allow the request to prevent blocking access
-      // This is a safety measure to prevent users from being locked out
+      return new Response(
+        JSON.stringify({
+          error: 'Failed to check subscription status',
+          redirect: '/pricing',
+        }),
+        { status: 500 }
+      );
     }
 
     const userMessage = getMostRecentUserMessage(messages);

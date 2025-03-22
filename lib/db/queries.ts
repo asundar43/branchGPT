@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { genSaltSync, hashSync } from 'bcrypt-ts';
-import { and, asc, desc, eq, gt, gte, inArray } from 'drizzle-orm';
+import { and, asc, desc, eq, gt, gte, inArray, sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 
@@ -358,35 +358,117 @@ export async function updateChatVisiblityById({
 
 export async function hasActiveSubscription(userId: string): Promise<boolean> {
   try {
-    console.log('Checking subscription for user:', userId);
-    
-    const userSubscriptions = await db
+    const [subscription] = await db
       .select()
       .from(subscriptions)
       .where(
         and(
-          eq(subscriptions.user_id, userId),
+          eq(subscriptions.userId, userId),
           eq(subscriptions.status, 'active'),
-          gt(subscriptions.current_period_end, new Date())
-        )
+          gt(subscriptions.currentPeriodEnd, new Date()),
+        ),
       );
-    
-    const hasActive = userSubscriptions.length > 0;
-    console.log('Subscription check result:', {
-      userId,
-      hasActive,
-      subscriptionCount: userSubscriptions.length,
-      subscriptions: userSubscriptions.map(s => ({
-        id: s.id,
-        status: s.status,
-        periodEnd: s.current_period_end
-      }))
-    });
-    
-    return hasActive;
+
+    return !!subscription;
   } catch (error) {
-    console.error('Failed to check subscription status:', error);
-    // If there's an error checking the subscription, return false to be safe
+    console.error('Failed to check subscription:', error);
     return false;
   }
+}
+
+export async function startFreeTrial(userId: string) {
+  try {
+    const startDate = new Date();
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + 14); // 14-day trial
+
+    const result = await db
+      .update(user)
+      .set({
+        freeTrialStartDate: startDate,
+        freeTrialEndDate: endDate,
+        chatCount: 0,
+        lastChatReset: startDate,
+      })
+      .where(eq(user.id, userId))
+      .returning();
+
+    if (result.length === 0) {
+      throw new Error('User not found');
+    }
+
+    return result[0];
+  } catch (error) {
+    console.error('Failed to start free trial:', error);
+    throw error;
+  }
+}
+
+export async function checkFreeTrialStatus(userId: string): Promise<{
+  isActive: boolean;
+  daysRemaining: number;
+  chatsRemaining: number;
+}> {
+  try {
+    const [userData] = await db
+      .select({
+        freeTrialStartDate: user.freeTrialStartDate,
+        freeTrialEndDate: user.freeTrialEndDate,
+        chatCount: user.chatCount,
+        lastChatReset: user.lastChatReset,
+      })
+      .from(user)
+      .where(eq(user.id, userId));
+
+    if (!userData) {
+      return { isActive: false, daysRemaining: 0, chatsRemaining: 0 };
+    }
+
+    const now = new Date();
+    const lastReset = new Date(userData.lastChatReset);
+    const daysSinceReset = (now.getTime() - lastReset.getTime()) / (1000 * 60 * 60 * 24);
+
+    // Reset chat count if more than 1 day has passed
+    if (daysSinceReset >= 1) {
+      await db
+        .update(user)
+        .set({
+          chatCount: 0,
+          lastChatReset: now,
+        })
+        .where(eq(user.id, userId));
+      userData.chatCount = 0;
+    }
+
+    const daysRemaining = userData.freeTrialEndDate
+      ? Math.max(0, Math.ceil((userData.freeTrialEndDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)))
+      : 0;
+
+    const isActive = daysRemaining > 0;
+    const chatsRemaining = Math.max(0, 10 - userData.chatCount);
+
+    return { isActive, daysRemaining, chatsRemaining };
+  } catch (error) {
+    console.error('Failed to check free trial status:', error);
+    throw error;
+  }
+}
+
+export async function incrementChatCount(userId: string) {
+  try {
+    return await db
+      .update(user)
+      .set({
+        chatCount: sql`${user.chatCount} + 1`,
+      })
+      .where(eq(user.id, userId));
+  } catch (error) {
+    console.error('Failed to increment chat count:', error);
+    throw error;
+  }
+}
+
+export async function isAllowedModel(model: string): Promise<boolean> {
+  const allowedModels = ['gpt-4', 'gpt-4-mini', 'dalle-2', 'o3-mini-high'];
+  return allowedModels.includes(model);
 }

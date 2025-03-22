@@ -7,6 +7,7 @@ import { toast } from '@/components/toast';
 import { AuthForm } from '@/components/auth-form';
 import { SubmitButton } from '@/components/submit-button';
 import { login, type LoginActionState } from '../../actions';
+import { hasActiveSubscription, checkFreeTrialStatus } from '@/lib/db/queries';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -35,11 +36,26 @@ export default function LoginPage() {
         description: 'Successfully signed in!',
       });
       
-      // Wait for the auth state to be updated before redirecting
-      setTimeout(() => {
-        router.push('/chat');
-        router.refresh();
-      }, 500);
+      // Check subscription status and redirect accordingly
+      const checkSubscriptionAndRedirect = async () => {
+        try {
+          const response = await fetch('/api/free-trial');
+          const trialStatus = await response.json();
+          
+          if (!trialStatus.isActive) {
+            router.push('/pricing');
+          } else {
+            router.push('/chat');
+          }
+          router.refresh();
+        } catch (error) {
+          console.error('Error checking subscription:', error);
+          router.push('/pricing');
+        }
+      };
+
+      // Wait for the auth state to be updated before checking subscription
+      setTimeout(checkSubscriptionAndRedirect, 500);
     }
   }, [state.status, router]);
 

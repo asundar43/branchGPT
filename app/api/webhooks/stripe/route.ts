@@ -59,20 +59,20 @@ export async function POST(req: Request) {
           
           // Insert subscription record
           await db.insert(subscriptions).values({
-            user_id: userId,
-            stripe_customer_id: session.customer as string,
-            stripe_subscription_id: subscription.id,
-            stripe_price_id: subscription.items.data[0].price.id,
+            userId,
+            stripeCustomerId: session.customer as string,
+            stripeSubscriptionId: subscription.id,
+            stripePriceId: subscription.items.data[0].price.id,
             status,
-            current_period_start: new Date(subscription.current_period_start * 1000),
-            current_period_end: new Date(subscription.current_period_end * 1000),
-            cancel_at_period_end: subscription.cancel_at_period_end,
+            currentPeriodStart: new Date(subscription.current_period_start * 1000),
+            currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+            cancelAtPeriodEnd: subscription.cancel_at_period_end,
           });
 
           console.log('Checkout completed for user:', userId, 'with status:', status);
         } catch (error) {
           console.error('Error processing checkout.session.completed:', error);
-          // Don't throw here, just log the error
+          throw error; // Re-throw to be caught by outer try-catch
         }
         break;
       }
@@ -89,17 +89,17 @@ export async function POST(req: Request) {
             .update(subscriptions)
             .set({
               status,
-              current_period_start: new Date(subscription.current_period_start * 1000),
-              current_period_end: new Date(subscription.current_period_end * 1000),
-              cancel_at_period_end: subscription.cancel_at_period_end,
-              updated_at: new Date(),
+              currentPeriodStart: new Date(subscription.current_period_start * 1000),
+              currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+              cancelAtPeriodEnd: subscription.cancel_at_period_end,
+              updatedAt: new Date(),
             })
-            .where(eq(subscriptions.stripe_subscription_id, subscription.id));
+            .where(eq(subscriptions.stripeSubscriptionId, subscription.id));
 
           console.log('Subscription updated:', subscription.id, 'with status:', status);
         } catch (error) {
           console.error('Error processing customer.subscription.updated:', error);
-          // Don't throw here, just log the error
+          throw error; // Re-throw to be caught by outer try-catch
         }
         break;
       }
@@ -113,16 +113,16 @@ export async function POST(req: Request) {
             .update(subscriptions)
             .set({
               status: 'canceled',
-              current_period_end: new Date(subscription.current_period_end * 1000),
-              cancel_at_period_end: true,
-              updated_at: new Date(),
+              currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+              cancelAtPeriodEnd: true,
+              updatedAt: new Date(),
             })
-            .where(eq(subscriptions.stripe_subscription_id, subscription.id));
+            .where(eq(subscriptions.stripeSubscriptionId, subscription.id));
 
           console.log('Subscription cancelled:', subscription.id);
         } catch (error) {
           console.error('Error processing customer.subscription.deleted:', error);
-          // Don't throw here, just log the error
+          throw error; // Re-throw to be caught by outer try-catch
         }
         break;
       }
@@ -133,7 +133,7 @@ export async function POST(req: Request) {
     console.error('Webhook error:', error);
     return NextResponse.json(
       { error: 'Webhook handler failed' },
-      { status: 400 }
+      { status: 500 }
     );
   }
 }

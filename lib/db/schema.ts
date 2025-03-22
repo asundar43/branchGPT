@@ -10,12 +10,24 @@ import {
   foreignKey,
   boolean,
   pgEnum,
+  integer,
 } from 'drizzle-orm/pg-core';
+
+export const subscriptionStatusEnum = pgEnum('subscription_status', [
+  'active',
+  'canceled',
+  'past_due',
+  'unpaid',
+]);
 
 export const user = pgTable('User', {
   id: uuid('id').primaryKey().notNull().defaultRandom(),
   email: varchar('email', { length: 64 }).notNull(),
   password: varchar('password', { length: 64 }),
+  freeTrialStartDate: timestamp('freeTrialStartDate'),
+  freeTrialEndDate: timestamp('freeTrialEndDate'),
+  chatCount: integer('chatCount').notNull().default(0),
+  lastChatReset: timestamp('lastChatReset').notNull().defaultNow(),
 });
 
 export type User = InferSelectModel<typeof user>;
@@ -137,19 +149,26 @@ export const branchConnection = pgTable('BranchConnection', {
 
 export type BranchConnection = InferSelectModel<typeof branchConnection>;
 
-export const subscriptionStatusEnum = pgEnum('subscription_status', ['active', 'canceled', 'past_due', 'unpaid']);
 export const subscriptionPlanEnum = pgEnum('subscription_plan', ['monthly', 'annual']);
 
 export const subscriptions = pgTable('subscriptions', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  user_id: text('user_id').notNull(),
-  stripe_customer_id: text('stripe_customer_id').notNull(),
-  stripe_subscription_id: text('stripe_subscription_id').notNull(),
-  stripe_price_id: text('stripe_price_id').notNull(),
-  status: subscriptionStatusEnum('status').notNull(),
-  current_period_start: timestamp('current_period_start').notNull(),
-  current_period_end: timestamp('current_period_end').notNull(),
-  cancel_at_period_end: boolean('cancel_at_period_end').notNull().default(false),
-  created_at: timestamp('created_at').notNull().defaultNow(),
-  updated_at: timestamp('updated_at').notNull().defaultNow(),
+  id: uuid('id').primaryKey().notNull().defaultRandom(),
+  userId: text('user_id').notNull(),
+  stripeCustomerId: text('stripe_customer_id').notNull(),
+  stripeSubscriptionId: text('stripe_subscription_id').notNull(),
+  stripePriceId: text('stripe_price_id').notNull(),
+  status: varchar('status').notNull(),
+  currentPeriodStart: timestamp('current_period_start').notNull(),
+  currentPeriodEnd: timestamp('current_period_end').notNull(),
+  cancelAtPeriodEnd: boolean('cancel_at_period_end').notNull().default(false),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export const chatUsage = pgTable('ChatUsage', {
+  id: uuid('id').primaryKey().notNull().defaultRandom(),
+  userId: uuid('userId')
+    .notNull()
+    .references(() => user.id),
+  timestamp: timestamp('timestamp').notNull().defaultNow(),
 });

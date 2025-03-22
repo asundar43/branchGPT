@@ -9,11 +9,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
+import { Lock, Globe } from 'lucide-react';
 
 import {
   CheckCircleFillIcon,
   ChevronDownIcon,
-  GlobeIcon,
   LockIcon,
 } from './icons';
 import { useChatVisibility } from '@/hooks/use-chat-visibility';
@@ -36,18 +37,22 @@ const visibilities: Array<{
     id: 'public',
     label: 'Public',
     description: 'Anyone with the link can access this chat',
-    icon: <GlobeIcon />,
+    icon: <LockIcon />,
   },
 ];
 
-export function VisibilitySelector({
-  chatId,
-  className,
-  selectedVisibilityType,
-}: {
+interface VisibilitySelectorProps {
   chatId: string;
   selectedVisibilityType: VisibilityType;
-} & React.ComponentProps<typeof Button>) {
+  isFreeTrial?: boolean;
+}
+
+export function VisibilitySelector({
+  chatId,
+  selectedVisibilityType,
+  isFreeTrial,
+}: VisibilitySelectorProps) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
 
   const { visibilityType, setVisibilityType } = useChatVisibility({
@@ -60,33 +65,38 @@ export function VisibilitySelector({
     [visibilityType],
   );
 
+  const handleVisibilitySelect = (visibility: VisibilityType) => {
+    if (visibility === 'public' && isFreeTrial) {
+      router.push('/pricing');
+      return;
+    }
+    setVisibilityType(visibility);
+    setOpen(false);
+  };
+
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger
         asChild
         className={cn(
           'w-fit data-[state=open]:bg-accent data-[state=open]:text-accent-foreground',
-          className,
         )}
       >
         <Button
           variant="outline"
-          className="hidden md:flex md:px-2 md:h-[34px]"
+          className="hidden md:flex md:px-2 md:h-[34px] w-[120px] justify-between"
         >
           {selectedVisibility?.icon}
-          {selectedVisibility?.label}
+          <span className="ml-2 capitalize">{selectedVisibility?.label}</span>
           <ChevronDownIcon />
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="start" className="min-w-[300px]">
+      <DropdownMenuContent align="start" className="min-w-[300px] w-[120px]">
         {visibilities.map((visibility) => (
           <DropdownMenuItem
             key={visibility.id}
-            onSelect={() => {
-              setVisibilityType(visibility.id);
-              setOpen(false);
-            }}
+            onSelect={() => handleVisibilitySelect(visibility.id)}
             className="gap-4 group/item flex flex-row justify-between items-center"
             data-active={visibility.id === visibilityType}
           >
@@ -99,10 +109,21 @@ export function VisibilitySelector({
               )}
             </div>
             <div className="text-foreground dark:text-foreground opacity-0 group-data-[active=true]/item:opacity-100">
-              <CheckCircleFillIcon />
+              {visibility.id === 'private' ? <LockIcon /> : <Globe />}
             </div>
           </DropdownMenuItem>
         ))}
+        {selectedVisibility?.id === 'public' && isFreeTrial && (
+          <DropdownMenuItem
+            onSelect={() => handleVisibilitySelect('public')}
+            className="flex items-center justify-between"
+          >
+            <div className="flex items-center">
+              <Lock />
+              <span>Pro</span>
+            </div>
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

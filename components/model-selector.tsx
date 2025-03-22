@@ -1,6 +1,8 @@
 'use client';
 
 import { startTransition, useMemo, useOptimistic, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Lock } from 'lucide-react';
 
 import { saveChatModelAsCookie } from '@/app/(chat)/actions';
 import { Button } from '@/components/ui/button';
@@ -20,12 +22,15 @@ import { CheckCircleFillIcon, ChevronDownIcon } from './icons';
 export function ModelSelector({
   selectedModelId,
   className,
+  isFreeTrial = false,
 }: {
   selectedModelId: string;
+  isFreeTrial?: boolean;
 } & React.ComponentProps<typeof Button>) {
   const [open, setOpen] = useState(false);
   const [optimisticModelId, setOptimisticModelId] =
     useOptimistic(selectedModelId);
+  const router = useRouter();
 
   const selectedChatModel = useMemo(
     () => chatModels.find((chatModel) => chatModel.id === optimisticModelId),
@@ -44,6 +49,20 @@ export function ModelSelector({
     }, {} as Record<string, typeof chatModels>);
     return groups;
   }, []);
+
+  const handleModelSelect = (modelId: string) => {
+    const model = chatModels.find((m) => m.id === modelId);
+    if (model?.isPremium && isFreeTrial) {
+      router.push('/pricing');
+      return;
+    }
+    setOpen(false);
+
+    startTransition(() => {
+      setOptimisticModelId(modelId);
+      saveChatModelAsCookie(modelId);
+    });
+  };
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -66,23 +85,29 @@ export function ModelSelector({
               {category}
             </DropdownMenuLabel>
             {models.map((model) => {
-              const { id } = model;
+              const { id, freeTrialAvailable } = model;
+              const isDisabled = isFreeTrial && !freeTrialAvailable;
+
               return (
                 <DropdownMenuItem
                   key={id}
-                  onSelect={() => {
-                    setOpen(false);
-
-                    startTransition(() => {
-                      setOptimisticModelId(id);
-                      saveChatModelAsCookie(id);
-                    });
-                  }}
-                  className="gap-4 group/item flex flex-row justify-between items-center"
+                  onSelect={() => handleModelSelect(id)}
+                  className={cn(
+                    "gap-4 group/item flex flex-row justify-between items-center",
+                    isDisabled && "opacity-50 cursor-not-allowed"
+                  )}
                   data-active={id === optimisticModelId}
                 >
                   <div className="flex flex-col gap-1 items-start">
-                    <div>{model.name}</div>
+                    <div className="flex items-center gap-2">
+                      {model.name}
+                      {isDisabled && (
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <Lock className="h-3 w-3" />
+                          <span>Pro</span>
+                        </div>
+                      )}
+                    </div>
                     <div className="text-xs text-muted-foreground">
                       {model.description}
                     </div>

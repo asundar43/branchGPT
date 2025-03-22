@@ -90,19 +90,46 @@ export default function LandingPage() {
             <div className="absolute -top-8 -right-8 w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full filter blur-2xl opacity-20" />
           </div>
           <p className="text-xl mb-12 text-neutral-400 leading-relaxed max-w-2xl mx-auto">
-            Explore multiple conversation paths simultaneously. Never lose context. 
-            Find the perfect response every time.
+            Experience the future of AI conversations. BranchGPT helps you explore multiple paths simultaneously, 
+            making complex problem-solving and creative exploration more efficient than ever.
           </p>
           <div className="flex items-center justify-center gap-4">
             <Link href="/auth/register">
               <Button size="lg" className="bg-white text-black hover:bg-white/90 transition-colors px-8 py-6 text-lg rounded-2xl">
-                Get Started
+                Start Free Trial
+              </Button>
+            </Link>
+            <Link href="#demo">
+              <Button size="lg" variant="outline" className="text-white hover:text-white/90 hover:bg-white/10 border-white/20 transition-colors px-8 py-6 text-lg rounded-2xl">
+                Watch Demo
               </Button>
             </Link>
           </div>
 
+          {/* Social Proof */}
+          <div className="mt-16 flex flex-col items-center gap-8">
+            <div className="flex items-center gap-2 text-white/80">
+              <div className="flex -space-x-2">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 border-2 border-black" />
+                ))}
+              </div>
+              <span>Join 10,000+ users already branching their conversations</span>
+            </div>
+            <div className="flex items-center gap-4 text-white/80">
+              <div className="flex items-center gap-1">
+                <svg className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.363 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.363-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+                <span>4.9/5</span>
+              </div>
+              <span>•</span>
+              <span>Trusted by developers, researchers, and creatives</span>
+            </div>
+          </div>
+
           {/* Demo Video Section */}
-          <div className="mt-16 relative">
+          <div id="demo" className="mt-16 relative">
             <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-3xl blur opacity-20" />
             <div className="relative rounded-3xl overflow-hidden bg-black/50 backdrop-blur-sm border border-white/10">
               <video 
@@ -125,27 +152,163 @@ export default function LandingPage() {
           {[
             {
               title: "Branch Conversations",
-              description: "Create multiple conversation paths from any point, exploring different directions simultaneously."
+              description: "Create multiple conversation paths from any point, exploring different directions simultaneously.",
+              icon: "🌳"
             },
             {
               title: "Never Lose Context",
-              description: "Keep your conversation history organized with our intuitive branching system."
+              description: "Keep your conversation history organized with our intuitive branching system.",
+              icon: "🧠"
             },
             {
               title: "Efficient Exploration",
-              description: "Compare different approaches side by side to find the perfect solution."
+              description: "Compare different approaches side by side to find the perfect solution.",
+              icon: "⚡"
             }
           ].map((feature, i) => (
             <div key={i} className="group p-8 rounded-3xl bg-white/5 backdrop-blur-lg border border-white/10 hover:border-white/20 transition-all duration-300">
               <div className="relative">
                 <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg blur opacity-0 group-hover:opacity-20 transition duration-500" />
-                <h3 className="relative text-xl font-semibold mb-3 text-white/90">{feature.title}</h3>
+                <div className="relative flex items-center gap-3">
+                  <span className="text-2xl">{feature.icon}</span>
+                  <h3 className="text-xl font-semibold text-white/90">{feature.title}</h3>
+                </div>
               </div>
-              <p className="text-neutral-400">
+              <p className="text-neutral-400 mt-4">
                 {feature.description}
               </p>
             </div>
           ))}
+        </div>
+
+        {/* Comparison Section */}
+        <div className="mt-40">
+          <h2 className="text-3xl font-bold text-center mb-12 text-white/90">Why Choose BranchGPT?</h2>
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="p-8 rounded-3xl bg-white/5 backdrop-blur-lg border border-white/10">
+              <h3 className="text-xl font-semibold mb-4 text-white/90">Traditional AI Chat</h3>
+              <ul className="space-y-3 text-neutral-400">
+                <li className="flex items-center gap-2">
+                  <span className="text-red-500">✕</span>
+                  Linear conversation flow
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-red-500">✕</span>
+                  Limited exploration options
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-red-500">✕</span>
+                  Context loss when switching topics
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-red-500">✕</span>
+                  No way to compare approaches
+                </li>
+              </ul>
+            </div>
+            <div className="p-8 rounded-3xl bg-gradient-to-br from-blue-500/10 to-purple-500/10 backdrop-blur-lg border border-white/20">
+              <h3 className="text-xl font-semibold mb-4 text-white/90">BranchGPT</h3>
+              <ul className="space-y-3 text-neutral-400">
+                <li className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span>
+                  Multiple conversation paths
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span>
+                  Unlimited exploration
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span>
+                  Maintain context across branches
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span>
+                  Compare solutions side by side
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* Testimonials */}
+        <div className="mt-40">
+          <h2 className="text-3xl font-bold text-center mb-12 text-white/90">What Our Users Say</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                quote: "BranchGPT has revolutionized how I approach complex problems. The ability to explore multiple solutions simultaneously is game-changing.",
+                author: "Sarah Chen",
+                role: "Software Engineer at Google",
+                avatar: "/images/testimonials/sarah.jpg"
+              },
+              {
+                quote: "As a researcher, I love how BranchGPT helps me explore different hypotheses without losing track of my thought process.",
+                author: "Dr. Michael Rodriguez",
+                role: "AI Researcher",
+                avatar: "/images/testimonials/michael.jpg"
+              },
+              {
+                quote: "The branching system is intuitive and powerful. It's like having multiple AI assistants working together to solve your problems.",
+                author: "Emma Thompson",
+                role: "Product Designer",
+                avatar: "/images/testimonials/emma.jpg"
+              }
+            ].map((testimonial, i) => (
+              <div key={i} className="p-8 rounded-3xl bg-white/5 backdrop-blur-lg border border-white/10">
+                <p className="text-neutral-400 mb-6">"{testimonial.quote}"</p>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-500" />
+                  <div>
+                    <p className="text-white/90 font-semibold">{testimonial.author}</p>
+                    <p className="text-neutral-400 text-sm">{testimonial.role}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* FAQ Section */}
+        <div className="mt-40">
+          <h2 className="text-3xl font-bold text-center mb-12 text-white/90">Frequently Asked Questions</h2>
+          <div className="max-w-3xl mx-auto space-y-6">
+            {[
+              {
+                question: "How does BranchGPT work?",
+                answer: "BranchGPT allows you to create multiple conversation paths from any point in your chat. You can explore different approaches simultaneously, compare responses, and merge the best ideas into a single thread."
+              },
+              {
+                question: "Is there a free trial?",
+                answer: "Yes! We offer a 14-day free trial with full access to all features. No credit card required to start."
+              },
+              {
+                question: "Can I export my conversations?",
+                answer: "Yes, you can export your conversations in various formats including Markdown, PDF, and JSON. This makes it easy to share your work or integrate it into your existing workflow."
+              },
+              {
+                question: "What AI models do you use?",
+                answer: "We use state-of-the-art language models including GPT-4 and Claude. Each branch can use different models, allowing you to compare their capabilities."
+              }
+            ].map((faq, i) => (
+              <div key={i} className="p-6 rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10">
+                <h3 className="text-lg font-semibold mb-2 text-white/90">{faq.question}</h3>
+                <p className="text-neutral-400">{faq.answer}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Final CTA */}
+        <div className="mt-40 text-center">
+          <h2 className="text-3xl font-bold mb-6 text-white/90">Ready to Transform Your AI Conversations?</h2>
+          <p className="text-xl mb-8 text-neutral-400 max-w-2xl mx-auto">
+            Join thousands of users who are already experiencing the future of AI conversations.
+          </p>
+          <Link href="/auth/register">
+            <Button size="lg" className="bg-white text-black hover:bg-white/90 transition-colors px-8 py-6 text-lg rounded-2xl">
+              Start Your Free Trial
+            </Button>
+          </Link>
         </div>
       </div>
     </div>

@@ -2,11 +2,13 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Check } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 import { useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { useSession } from 'next-auth/react';
 import { BackgroundBranches } from './background-branches';
+import { useRouter } from 'next/navigation';
+import { toast } from '@/components/toast';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -19,13 +21,29 @@ const features = [
   'Priority support & updates',
 ];
 
+const freeTrialFeatures = [
+  'Limited to 10 chats per day',
+  'Basic AI models only',
+  'No custom AI settings',
+  'No priority support',
+  'Trial expires in 14 days',
+];
+
 const tiers = [
+  {
+    name: 'Free Trial',
+    id: 'trial',
+    price: { monthly: '$0' },
+    description: 'Limited access to try BranchGPT',
+    features: freeTrialFeatures,
+    isTrial: true,
+  },
   {
     name: 'Monthly',
     id: 'monthly',
     price: { monthly: '$20' },
     priceId: process.env.NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID,
-    description: 'Flexible monthly access to BranchGPT',
+    description: 'Full access to BranchGPT',
     features,
   },
   {
@@ -35,6 +53,7 @@ const tiers = [
     priceId: process.env.NEXT_PUBLIC_STRIPE_ANNUAL_PRICE_ID,
     description: 'Best value for power users',
     features,
+    isPopular: true,
   },
 ];
 
@@ -42,6 +61,7 @@ export function Pricing() {
   const { data: session } = useSession();
   const [isAnnual, setIsAnnual] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const handleSubscribe = async (priceId: string) => {
     if (!session?.user?.id) {
@@ -93,6 +113,49 @@ export function Pricing() {
     }
   };
 
+  const handleStartTrial = async () => {
+    if (!session?.user?.id) {
+      toast({
+        type: 'error',
+        description: 'Please sign in to start your free trial',
+      });
+      router.push('/auth/login');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const response = await fetch('/api/free-trial/start', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to start free trial');
+      }
+
+      toast({
+        type: 'success',
+        description: 'Free trial started successfully!',
+      });
+
+      router.push('/chat');
+      router.refresh();
+    } catch (error) {
+      console.error('Error starting free trial:', error);
+      toast({
+        type: 'error',
+        description: error instanceof Error ? error.message : 'Failed to start free trial. Please try again.',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen relative isolate">
       <BackgroundBranches />
@@ -136,21 +199,30 @@ export function Pricing() {
             </div>
           </div>
 
-          <div className="isolate mx-auto mt-16 grid max-w-md grid-cols-1 gap-y-8 sm:mt-20 lg:mx-0 lg:max-w-none lg:grid-cols-2 lg:gap-x-8 xl:gap-x-12">
+          <div className="isolate mx-auto mt-16 grid max-w-md grid-cols-1 gap-y-8 sm:mt-20 lg:mx-0 lg:max-w-none lg:grid-cols-3 lg:gap-x-8 xl:gap-x-12">
             {tiers.map((tier) => (
               <Card
                 key={tier.id}
-                onClick={() => setIsAnnual(tier.id === 'annual')}
+                onClick={() => !tier.isTrial && setIsAnnual(tier.id === 'annual')}
                 className={`flex flex-col justify-between backdrop-blur-sm bg-card/80 cursor-pointer transition-all duration-200 hover:scale-[1.02] ${
                   tier.id === 'annual' && isAnnual
                     ? 'ring-2 ring-primary shadow-lg shadow-indigo-500/10'
                     : tier.id === 'monthly' && !isAnnual
                     ? 'ring-2 ring-primary shadow-lg shadow-indigo-500/10'
+                    : tier.isTrial
+                    ? 'ring-2 ring-primary/30 shadow-lg shadow-indigo-500/5'
                     : 'hover:border-primary/50'
                 }`}
               >
                 <CardHeader>
-                  <CardTitle>{tier.name}</CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle>{tier.name}</CardTitle>
+                    {tier.isPopular && (
+                      <span className="inline-flex items-center rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 px-2.5 py-0.5 text-xs font-medium text-white">
+                        Most Popular
+                      </span>
+                    )}
+                  </div>
                   <CardDescription>{tier.description}</CardDescription>
                   <div className="mt-4 flex flex-col">
                     <div className="flex items-baseline">
@@ -173,11 +245,17 @@ export function Pricing() {
                     {tier.features.map((feature) => (
                       <li key={feature} className="flex gap-x-3">
                         <div className="flex-none">
-                          <div className="h-5 w-5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                            <Check className="h-3.5 w-3.5 text-white" aria-hidden="true" />
-                          </div>
+                          {tier.isTrial ? (
+                            <div className="h-5 w-5 rounded-full flex items-center justify-center bg-primary/20">
+                              <X className="h-3.5 w-3.5 text-primary/60" aria-hidden="true" />
+                            </div>
+                          ) : (
+                            <div className="h-5 w-5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                              <Check className="h-3.5 w-3.5 text-white" aria-hidden="true" />
+                            </div>
+                          )}
                         </div>
-                        {feature}
+                        <span className={tier.isTrial ? 'text-primary/80' : ''}>{feature}</span>
                       </li>
                     ))}
                   </ul>
@@ -187,12 +265,16 @@ export function Pricing() {
                     className={`w-full ${
                       (tier.id === 'annual' && isAnnual) || (tier.id === 'monthly' && !isAnnual)
                         ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 text-white border-0'
+                        : tier.isTrial
+                        ? 'bg-primary/10 text-primary hover:bg-primary/20 border-primary/20'
                         : ''
                     }`}
                     variant={tier.id === 'annual' && isAnnual || tier.id === 'monthly' && !isAnnual ? 'default' : 'outline'}
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (tier.priceId) {
+                      if (tier.isTrial) {
+                        handleStartTrial();
+                      } else if (tier.priceId) {
                         handleSubscribe(tier.priceId);
                       } else {
                         console.error('Price ID not found for tier:', tier.id);
@@ -200,7 +282,7 @@ export function Pricing() {
                     }}
                     disabled={isLoading || !session?.user?.id}
                   >
-                    {isLoading ? 'Loading...' : 'Start branching'}
+                    {isLoading ? 'Loading...' : tier.isTrial ? 'Try Free Trial' : 'Start branching'}
                   </Button>
                 </CardFooter>
               </Card>

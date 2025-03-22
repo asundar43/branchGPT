@@ -4,7 +4,7 @@ import Credentials from 'next-auth/providers/credentials';
 import Google from 'next-auth/providers/google';
 import { generateId } from 'ai';
 
-import { getUser, createUser, hasActiveSubscription } from '@/lib/db/queries';
+import { getUser, createUser, hasActiveSubscription, startFreeTrial, checkFreeTrialStatus } from '@/lib/db/queries';
 
 import { authConfig } from './auth.config';
 
@@ -53,22 +53,14 @@ export const {
       return session;
     },
     async redirect({ url, baseUrl }) {
-      // Handle successful Stripe subscription
-      if (url.includes('success=true')) {
-        return `${baseUrl}/chat?success=true`;
-      }
-
-      // Handle pricing page redirects
-      if (url.includes('/pricing')) {
-        return `${baseUrl}/pricing`;
-      }
-
-      // Default to the original URL with baseUrl
-      if (url.startsWith('/')) {
-        return `${baseUrl}${url}`;
-      }
-
-      return url;
+      // If the url is relative, allow it
+      if (url.startsWith('/')) return url;
+      // If the url is from our domain, allow it
+      if (url.startsWith(baseUrl)) return url;
+      // If there's an error, redirect to pricing
+      if (url.includes('error=')) return '/pricing';
+      // Otherwise, redirect to the pricing page
+      return '/pricing';
     },
     async signIn({ user, account }) {
       // For Google sign-in, create user if they don't exist
@@ -77,6 +69,11 @@ export const {
         if (users.length === 0) {
           const randomPassword = generateId(32);
           await createUser(user.email!, randomPassword);
+          // Start free trial for new users
+          const newUsers = await getUser(user.email!);
+          if (newUsers.length > 0) {
+            await startFreeTrial(newUsers[0].id);
+          }
         }
         // Check subscription status for Google users
         try {
@@ -84,7 +81,10 @@ export const {
           if (existingUser.length > 0) {
             const hasSubscription = await hasActiveSubscription(existingUser[0].id);
             if (!hasSubscription) {
-              return '/pricing';
+              const trialStatus = await checkFreeTrialStatus(existingUser[0].id);
+              if (!trialStatus.isActive) {
+                return '/pricing';
+              }
             }
           }
         } catch (error) {
