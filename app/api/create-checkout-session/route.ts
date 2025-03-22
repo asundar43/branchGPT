@@ -51,6 +51,14 @@ export async function POST(req: Request) {
       allow_promotion_codes: true,
       billing_address_collection: 'required',
       customer_email: undefined, // Will be set by Stripe if user is logged in
+      metadata: {
+        userId,
+      },
+      subscription_data: {
+        metadata: {
+          userId,
+        },
+      },
     });
 
     if (!session?.id) {
