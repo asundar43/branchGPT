@@ -5,13 +5,10 @@ import { NextResponse } from 'next/server';
 export async function POST(request: Request) {
   try {
     const session = await auth();
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Please sign in to start your free trial' }, { status: 401 });
-    }
+    const userId = session?.user?.id;
 
     // Check if user already has an active trial
-    const trialStatus = await checkFreeTrialStatus(session.user.id);
+    const trialStatus = await checkFreeTrialStatus(userId!);
     if (trialStatus.isActive) {
       return NextResponse.json(
         { error: 'You already have an active free trial' },
@@ -20,7 +17,7 @@ export async function POST(request: Request) {
     }
 
     try {
-      await startFreeTrial(session.user.id);
+      await startFreeTrial(userId!);
       return NextResponse.json({ success: true });
     } catch (error) {
       if (error instanceof Error && error.message.includes('active paid subscription')) {
