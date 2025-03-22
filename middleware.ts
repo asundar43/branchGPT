@@ -32,25 +32,36 @@ export async function middleware(request: NextRequest) {
 
   response.headers.set('Content-Security-Policy', cspHeader);
 
-  // Check authentication and subscription
   const token = await getToken({ req: request });
+  const { pathname, searchParams } = request.nextUrl;
   
-  if (!token) {
-    // Let NextAuth handle the authentication redirect
-    return NextResponse.redirect(new URL('/', request.url));
+  // Handle post-subscription success redirect
+  if (pathname === '/chat' && searchParams.get('success') === 'true') {
+    if (!token) {
+      return NextResponse.redirect(new URL('/api/auth/signin', request.url));
+    }
+    return response; // Allow through to chat after successful subscription
   }
 
-  // Only check subscription for chat routes
-  if (request.nextUrl.pathname.startsWith('/chat')) {
-    try {
-      const hasSubscription = await hasActiveSubscription(token.sub as string);
-      if (!hasSubscription) {
-        return NextResponse.redirect(new URL('/pricing', request.url));
+  // Protected routes check
+  if (pathname.startsWith('/chat') || pathname.startsWith('/api/chat') || pathname.startsWith('/settings')) {
+    if (!token) {
+      // User not logged in - redirect to sign in
+      return NextResponse.redirect(new URL('/api/auth/signin', request.url));
+    }
+
+    // For chat routes, check subscription
+    if (pathname.startsWith('/chat') || pathname.startsWith('/api/chat')) {
+      try {
+        const hasSubscription = await hasActiveSubscription(token.sub as string);
+        if (!hasSubscription) {
+          // User logged in but no subscription - redirect to pricing
+          return NextResponse.redirect(new URL('/pricing', request.url));
+        }
+      } catch (error) {
+        console.error('Error checking subscription:', error);
+        return response; // Allow access on error to prevent loops
       }
-    } catch (error) {
-      console.error('Error checking subscription:', error);
-      // On error, allow access to prevent infinite redirects
-      return response;
     }
   }
 
