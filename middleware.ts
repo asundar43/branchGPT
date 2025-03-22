@@ -2,6 +2,8 @@ import NextAuth from 'next-auth';
 import { NextResponse } from 'next/server';
 import { auth } from '@/app/(auth)/auth';
 import { hasActiveSubscription } from '@/lib/db/queries';
+import { getToken } from 'next-auth/jwt';
+import type { NextRequest } from 'next/server';
 
 import { authConfig } from '@/app/(auth)/auth.config';
 
@@ -22,29 +24,40 @@ export const config = {
   ],
 };
 
-export async function middleware(request: Request) {
-  const session = await auth();
-  
-  // Allow access to public routes
-  if (!session?.user?.id) {
-    return NextResponse.next();
-  }
+export async function middleware(request: NextRequest) {
+  const response = NextResponse.next();
 
-  // Check subscription for protected routes
-  const url = new URL(request.url);
-  if (url.pathname.startsWith('/chat') || 
-      url.pathname.startsWith('/api/chat')) {
-    try {
-      const hasSubscription = await hasActiveSubscription(session.user.id);
-      if (!hasSubscription) {
-        return NextResponse.redirect(new URL('/pricing', url.origin));
-      }
-    } catch (error) {
-      console.error('Error checking subscription:', error);
-      // If there's an error checking subscription, allow access to prevent infinite redirects
-      return NextResponse.next();
+  // Add CSP headers
+  const cspHeader = `
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://va.vercel-scripts.com https://www.branchgpt.org;
+    style-src 'self' 'unsafe-inline';
+    img-src 'self' data: blob: https:;
+    font-src 'self';
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+    frame-ancestors 'none';
+    frame-src 'self' https://js.stripe.com https://hooks.stripe.com;
+    connect-src 'self' https://api.stripe.com https://r.stripe.com https://www.branchgpt.org https://va.vercel-scripts.com;
+    upgrade-insecure-requests;
+  `.replace(/\s+/g, ' ').trim();
+
+  response.headers.set('Content-Security-Policy', cspHeader);
+
+  // Continue with existing middleware logic
+  if (request.nextUrl.pathname.startsWith('/chat')) {
+    const token = await getToken({ req: request });
+    
+    if (!token) {
+      return NextResponse.redirect(new URL('/auth/signin', request.url));
+    }
+
+    const hasSubscription = await hasActiveSubscription(token.sub as string);
+    if (!hasSubscription) {
+      return NextResponse.redirect(new URL('/pricing', request.url));
     }
   }
 
-  return NextResponse.next();
+  return response;
 }
