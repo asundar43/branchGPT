@@ -68,12 +68,16 @@ export const {
       return session;
     },
     async redirect({ url, baseUrl }) {
-      // If the url is relative, prefix it with the base URL
-      if (url.startsWith('/')) return `${baseUrl}${url}`;
-      // If the url is external, redirect to the dashboard
-      if (url.startsWith('http')) return `${baseUrl}/chat`;
-      // Default to the dashboard
-      return `${baseUrl}/chat`;
+      // Redirect to pricing after Google sign-in for new users
+      if (url.startsWith('/pricing')) {
+        return `${baseUrl}/pricing`;
+      }
+      // Keep the original URL for other cases
+      if (url.startsWith('/')) {
+        return `${baseUrl}${url}`;
+      }
+      // Default to the original URL
+      return url;
     },
     async signIn({ user, account }) {
       // If signing in with Google
@@ -84,7 +88,7 @@ export const {
           // Create a random password for Google users (they won't use it)
           const randomPassword = generateId(32);
           await createUser(user.email!, randomPassword);
-          // Redirect to pricing page
+          // Redirect to pricing page for new users
           return '/pricing';
         }
       }

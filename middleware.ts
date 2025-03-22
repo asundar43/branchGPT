@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { getToken } from 'next-auth/jwt';
+import { auth } from '@/app/(auth)/auth';
 import { hasActiveSubscription } from '@/lib/db/queries';
 
 export const config = {
@@ -32,28 +32,18 @@ export async function middleware(request: NextRequest) {
 
   response.headers.set('Content-Security-Policy', cspHeader);
 
-  if (!process.env.AUTH_SECRET) {
-    console.error('AUTH_SECRET is not set');
-    return NextResponse.redirect(new URL('/auth/error', request.url));
-  }
-
-  const token = await getToken({ 
-    req: request,
-    secret: process.env.AUTH_SECRET
-  });
-  
+  const session = await auth();
   const { pathname } = request.nextUrl;
   
   // Check subscription for chat routes
   if (pathname.startsWith('/chat') || pathname.startsWith('/api/chat')) {
-    // If not authenticated, let NextAuth handle the redirect
-    if (!token) {
+    if (!session?.user?.id) {
       return NextResponse.redirect(new URL('/auth/login', request.url));
     }
 
     // Check subscription status for all authenticated users
     try {
-      const hasSubscription = await hasActiveSubscription(token.sub as string);
+      const hasSubscription = await hasActiveSubscription(session.user.id);
       if (!hasSubscription) {
         return NextResponse.redirect(new URL('/pricing', request.url));
       }
