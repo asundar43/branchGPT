@@ -1,4 +1,7 @@
 import NextAuth from 'next-auth';
+import { NextResponse } from 'next/server';
+import { auth } from '@/app/(auth)/auth';
+import { hasActiveSubscription } from '@/lib/db/queries';
 
 import { authConfig } from '@/app/(auth)/auth.config';
 
@@ -18,3 +21,24 @@ export const config = {
     // Add other protected routes here, but NOT the landing page
   ],
 };
+
+export async function middleware(request: Request) {
+  const session = await auth();
+  
+  // Allow access to public routes
+  if (!session?.user?.id) {
+    return NextResponse.next();
+  }
+
+  // Check subscription for protected routes
+  const url = new URL(request.url);
+  if (url.pathname.startsWith('/chat') || 
+      url.pathname.startsWith('/api/chat')) {
+    const hasSubscription = await hasActiveSubscription(session.user.id);
+    if (!hasSubscription) {
+      return NextResponse.redirect(new URL('/pricing', url.origin));
+    }
+  }
+
+  return NextResponse.next();
+}

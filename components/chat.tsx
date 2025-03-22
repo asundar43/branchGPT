@@ -20,6 +20,7 @@ import { AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { BranchConnection } from './branch-connection';
 import { ResizableDivider } from './resizable-divider';
+import { useRouter } from 'next/navigation';
 
 // Define a set of vibrant colors for branches
 const BRANCH_COLORS = [
@@ -48,6 +49,7 @@ export function Chat({
   selectedVisibilityType: VisibilityType;
   isReadonly: boolean;
 }) {
+  const router = useRouter();
   const { mutate } = useSWRConfig();
   const { branches, addBranch, removeBranch } = useBranchedChat();
   const isArtifactVisible = useArtifactSelector((state) => state.isVisible);
@@ -106,26 +108,38 @@ export function Chat({
 
   const {
     messages,
-    setMessages,
-    handleSubmit,
     input,
-    setInput,
-    append,
+    handleInputChange,
+    handleSubmit,
     isLoading,
     stop,
+    setMessages,
+    append,
+    error,
     reload,
+    setInput,
   } = useChat({
     id,
-    body: { id, selectedChatModel: selectedChatModel },
     initialMessages,
+    body: {
+      id,
+      selectedChatModel,
+    },
     experimental_throttle: 100,
     sendExtraMessageFields: true,
     generateId: generateUUID,
     onFinish: () => {
       mutate('/api/history');
     },
-    onError: () => {
-      toast.error('An error occurred, please try again!');
+    onError: (error) => {
+      // Handle subscription error
+      if (error.message === 'Subscription required') {
+        toast.error('Please subscribe to continue using the chat');
+        router.push('/pricing');
+        return;
+      }
+      // Handle other errors
+      toast.error(error.message || 'An error occurred');
     },
   });
 

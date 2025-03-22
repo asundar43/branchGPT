@@ -11,6 +11,7 @@ import {
   getChatById,
   saveChat,
   saveMessages,
+  hasActiveSubscription,
 } from '@/lib/db/queries';
 import {
   generateUUID,
@@ -76,6 +77,12 @@ export async function POST(request: Request) {
 
     if (!session || !session.user || !session.user.id) {
       return new Response('Unauthorized', { status: 401 });
+    }
+
+    // Check for active subscription
+    const hasSubscription = await hasActiveSubscription(session.user.id);
+    if (!hasSubscription) {
+      return new Response('Subscription required', { status: 403 });
     }
 
     const userMessage = getMostRecentUserMessage(messages);

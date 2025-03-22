@@ -15,6 +15,7 @@ import {
   type Message,
   message,
   vote,
+  subscriptions,
 } from './schema';
 import { ArtifactKind } from '@/components/artifact';
 
@@ -352,5 +353,24 @@ export async function updateChatVisiblityById({
   } catch (error) {
     console.error('Failed to update chat visibility in database');
     throw error;
+  }
+}
+
+export async function hasActiveSubscription(userId: string): Promise<boolean> {
+  try {
+    const userSubscriptions = await db
+      .select()
+      .from(subscriptions)
+      .where(
+        and(
+          eq(subscriptions.user_id, userId),
+          eq(subscriptions.status, 'active')
+        )
+      );
+    
+    return userSubscriptions.length > 0;
+  } catch (error) {
+    console.error('Failed to check subscription status');
+    return false;
   }
 }

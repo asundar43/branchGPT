@@ -21,6 +21,12 @@ export const chatModels: Array<ChatModel> = [
     description: 'Most capable model for complex tasks and detailed analysis',
     category: 'General Purpose',
   },
+  {
+    id: 'chat-model-gpt45',
+    name: 'GPT-4.5',
+    description: 'Enhanced capabilities with improved performance and reasoning',
+    category: 'General Purpose',
+  },
   // Research & Analysis Models
   {
     id: 'chat-model-sonar',
