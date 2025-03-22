@@ -84,7 +84,7 @@ export default function LandingPage() {
       <div className="relative container mx-auto px-4 pt-32 pb-16 z-10">
         <div className="max-w-4xl mx-auto text-center">
           <div className="relative">
-            <h1 className="text-7xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white via-white/90 to-white/80 tracking-tight">
+            <h1 className="text-4xl md:text-7xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white via-white/90 to-white/80 tracking-tight">
               Branch Your AI Conversations
             </h1>
             <div className="absolute -top-8 -right-8 w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full filter blur-2xl opacity-20" />
