@@ -33,42 +33,18 @@ export async function middleware(request: NextRequest) {
   response.headers.set('Content-Security-Policy', cspHeader);
 
   const token = await getToken({ req: request });
-  const { pathname, searchParams } = request.nextUrl;
+  const { pathname } = request.nextUrl;
   
-  // Handle post-subscription success redirect
-  if (pathname === '/chat' && searchParams.get('success') === 'true') {
-    if (!token) {
-      // Store the intended destination
-      const callbackUrl = new URL('/chat', request.url).toString();
-      const signinUrl = new URL('/login', request.url);
-      signinUrl.searchParams.set('callbackUrl', callbackUrl);
-      return NextResponse.redirect(signinUrl);
-    }
-    return response; // Allow through to chat after successful subscription
-  }
-
-  // Protected routes check
-  if (pathname.startsWith('/chat') || pathname.startsWith('/api/chat') || pathname.startsWith('/settings')) {
-    if (!token) {
-      // Store the intended destination
-      const callbackUrl = new URL(request.url).toString();
-      const signinUrl = new URL('/login', request.url);
-      signinUrl.searchParams.set('callbackUrl', callbackUrl);
-      return NextResponse.redirect(signinUrl);
-    }
-
-    // For chat routes, check subscription
-    if (pathname.startsWith('/chat') || pathname.startsWith('/api/chat')) {
-      try {
-        const hasSubscription = await hasActiveSubscription(token.sub as string);
-        if (!hasSubscription) {
-          // User logged in but no subscription - redirect to pricing
-          return NextResponse.redirect(new URL('/pricing', request.url));
-        }
-      } catch (error) {
-        console.error('Error checking subscription:', error);
-        return response; // Allow access on error to prevent loops
+  // Only check subscription for chat routes
+  if ((pathname.startsWith('/chat') || pathname.startsWith('/api/chat')) && token) {
+    try {
+      const hasSubscription = await hasActiveSubscription(token.sub as string);
+      if (!hasSubscription) {
+        return NextResponse.redirect(new URL('/pricing', request.url));
       }
+    } catch (error) {
+      console.error('Error checking subscription:', error);
+      return response;
     }
   }
 
