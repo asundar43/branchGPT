@@ -358,19 +358,35 @@ export async function updateChatVisiblityById({
 
 export async function hasActiveSubscription(userId: string): Promise<boolean> {
   try {
+    const now = new Date();
     const userSubscriptions = await db
       .select()
       .from(subscriptions)
       .where(
         and(
           eq(subscriptions.user_id, userId),
-          eq(subscriptions.status, 'active')
+          eq(subscriptions.status, 'active'),
+          gt(subscriptions.current_period_end, now)
         )
       );
     
     return userSubscriptions.length > 0;
   } catch (error) {
-    console.error('Failed to check subscription status');
+    console.error('Failed to check subscription status:', error);
     return false;
+  }
+}
+
+export async function getSubscriptionDetails(userId: string) {
+  try {
+    const userSubscriptions = await db
+      .select()
+      .from(subscriptions)
+      .where(eq(subscriptions.user_id, userId));
+    
+    return userSubscriptions;
+  } catch (error) {
+    console.error('Failed to get subscription details:', error);
+    return [];
   }
 }

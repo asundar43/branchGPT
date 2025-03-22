@@ -1,7 +1,7 @@
 import NextAuth from 'next-auth';
 import { NextResponse } from 'next/server';
 import { auth } from '@/app/(auth)/auth';
-import { hasActiveSubscription } from '@/lib/db/queries';
+import { hasActiveSubscription, getSubscriptionDetails } from '@/lib/db/queries';
 
 import { authConfig } from '@/app/(auth)/auth.config';
 
@@ -35,6 +35,16 @@ export async function middleware(request: Request) {
   if (url.pathname.startsWith('/chat') || 
       url.pathname.startsWith('/api/chat')) {
     const hasSubscription = await hasActiveSubscription(session.user.id);
+    
+    // Log subscription details for debugging
+    if (!hasSubscription) {
+      const subscriptionDetails = await getSubscriptionDetails(session.user.id);
+      console.log('Subscription check failed:', {
+        userId: session.user.id,
+        subscriptionDetails,
+      });
+    }
+    
     if (!hasSubscription) {
       return NextResponse.redirect(new URL('/pricing', url.origin));
     }
