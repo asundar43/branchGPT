@@ -82,19 +82,7 @@ export async function POST(request: Request) {
       return new Response('Unauthorized', { status: 401 });
     }
 
-    // Check if model is allowed for free trial
-    const isModelAllowed = await isAllowedModel(selectedChatModel);
-    if (!isModelAllowed) {
-      return new Response(
-        JSON.stringify({
-          error: 'This model is not available in the free trial',
-          redirect: '/pricing',
-        }),
-        { status: 403 }
-      );
-    }
-
-    // Check subscription and free trial status
+    // Check subscription and free trial status first
     try {
       const hasSubscription = await hasActiveSubscription(session.user.id);
       if (!hasSubscription) {
@@ -117,6 +105,18 @@ export async function POST(request: Request) {
               redirect: '/pricing',
             }),
             { status: 429 }
+          );
+        }
+
+        // Only check model restrictions for free trial users
+        const isModelAllowed = await isAllowedModel(selectedChatModel);
+        if (!isModelAllowed) {
+          return new Response(
+            JSON.stringify({
+              error: 'This model is not available in the free trial',
+              redirect: '/pricing',
+            }),
+            { status: 403 }
           );
         }
 

@@ -73,19 +73,23 @@ export const {
           const newUsers = await getUser(user.email!);
           if (newUsers.length > 0) {
             await startFreeTrial(newUsers[0].id);
+            return '/chat'; // New users with trial go straight to chat
           }
         }
-        // Check subscription status for Google users
+
+        // Check subscription status for existing Google users
         try {
           const existingUser = await getUser(user.email!);
           if (existingUser.length > 0) {
             const hasSubscription = await hasActiveSubscription(existingUser[0].id);
-            if (!hasSubscription) {
-              const trialStatus = await checkFreeTrialStatus(existingUser[0].id);
-              if (!trialStatus.isActive) {
-                return '/pricing';
-              }
+            if (hasSubscription) {
+              return '/chat'; // Users with active subscription go to chat
             }
+            const trialStatus = await checkFreeTrialStatus(existingUser[0].id);
+            if (trialStatus.isActive) {
+              return '/chat'; // Users with active trial go to chat
+            }
+            return '/pricing'; // Only show pricing if no active subscription or trial
           }
         } catch (error) {
           console.error('Error checking subscription:', error);
