@@ -33,7 +33,6 @@ export const {
       async authorize({ email, password }: any) {
         const users = await getUser(email);
         if (users.length === 0) return null;
-        // biome-ignore lint: Forbidden non-null assertion.
         const passwordsMatch = await compare(password, users[0].password!);
         if (!passwordsMatch) return null;
         return users[0] as any;
@@ -44,51 +43,44 @@ export const {
     async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
-        // Add a flag to indicate if this is a new user
-        if (!token.isNewUser) {
-          token.isNewUser = true;
-        }
       }
-
       return token;
     },
-    async session({
-      session,
-      token,
-    }: {
-      session: ExtendedSession;
-      token: any;
-    }) {
+    async session({ session, token }: { session: ExtendedSession; token: any }) {
       if (session.user) {
         session.user.id = token.id as string;
-        // Add the isNewUser flag to the session
-        session.user.isNewUser = token.isNewUser;
       }
-
       return session;
     },
     async redirect({ url, baseUrl }) {
-      // Redirect to pricing after Google sign-in for new users
-      if (url.startsWith('/pricing')) {
+      // Handle successful Stripe subscription
+      if (url.includes('success=true')) {
+        return `${baseUrl}/chat?success=true`;
+      }
+      
+      // Handle pricing page redirects
+      if (url.includes('/pricing')) {
         return `${baseUrl}/pricing`;
       }
-      // Keep the original URL for other cases
+
+      // Handle chat redirects
+      if (url.includes('/chat')) {
+        return `${baseUrl}/chat`;
+      }
+
+      // Default to the original URL with baseUrl
       if (url.startsWith('/')) {
         return `${baseUrl}${url}`;
       }
-      // Default to the original URL
+
       return url;
     },
     async signIn({ user, account }) {
-      // If signing in with Google
       if (account?.provider === 'google') {
         const users = await getUser(user.email!);
-        // If user doesn't exist in our database, create them
         if (users.length === 0) {
-          // Create a random password for Google users (they won't use it)
           const randomPassword = generateId(32);
           await createUser(user.email!, randomPassword);
-          // Redirect to pricing page for new users
           return '/pricing';
         }
       }
