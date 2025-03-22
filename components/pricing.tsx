@@ -58,10 +58,13 @@ const tiers = [
 ];
 
 export function Pricing() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [isAnnual, setIsAnnual] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
+  // Add loading state for session
+  const isSessionLoading = status === 'loading';
 
   const handleSubscribe = async (priceId: string) => {
     if (!session?.user?.id) {
@@ -288,9 +291,9 @@ export function Pricing() {
                         console.error('Price ID not found for tier:', tier.id);
                       }
                     }}
-                    disabled={isLoading || !session?.user?.id}
+                    disabled={isLoading || isSessionLoading}
                   >
-                    {isLoading ? 'Loading...' : tier.isTrial ? 'Try Free Trial' : 'Start branching'}
+                    {isLoading || isSessionLoading ? 'Loading...' : tier.isTrial ? 'Try Free Trial' : 'Start branching'}
                   </Button>
                 </CardFooter>
               </Card>
