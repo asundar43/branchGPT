@@ -2,9 +2,11 @@ import {
   customProvider,
   extractReasoningMiddleware,
   wrapLanguageModel,
+  type LanguageModelV1,
 } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { fireworks } from '@ai-sdk/fireworks';
+import { perplexity } from '@ai-sdk/perplexity';
 import { isTestEnvironment } from '../constants';
 import {
   artifactModel,
@@ -12,6 +14,10 @@ import {
   reasoningModel,
   titleModel,
 } from './models.test';
+
+const perplexitySonar = perplexity('sonar') as LanguageModelV1;
+const perplexitySonarPro = perplexity('sonar-pro') as LanguageModelV1;
+const perplexitySonarDeep = perplexity('sonar-deep') as LanguageModelV1;
 
 export const myProvider = isTestEnvironment
   ? customProvider({
@@ -31,6 +37,9 @@ export const myProvider = isTestEnvironment
           model: openai('o3-mini'),
           middleware: extractReasoningMiddleware({ tagName: 'think' }),
         }),
+        'chat-model-sonar': perplexitySonar,
+        'chat-model-sonar-pro': perplexitySonarPro,
+        'chat-model-sonar-deep': perplexitySonarDeep,
         'title-model': openai('gpt-4-turbo'),
         'artifact-model': openai('gpt-4o-mini'),
       },

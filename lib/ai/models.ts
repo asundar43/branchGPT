@@ -22,4 +22,19 @@ export const chatModels: Array<ChatModel> = [
     name: 'O3 Mini with Reasoning',
     description: 'O3-mini model with enhanced reasoning capabilities',
   },
+  {
+    id: 'chat-model-sonar',
+    name: 'Sonar',
+    description: 'Perplexity Sonar model for balanced performance',
+  },
+  {
+    id: 'chat-model-sonar-pro',
+    name: 'Sonar Pro',
+    description: 'Perplexity Sonar Pro model for advanced capabilities',
+  },
+  {
+    id: 'chat-model-sonar-deep',
+    name: 'Sonar Deep Research',
+    description: 'Perplexity Sonar Deep Research model for in-depth analysis',
+  },
 ];
