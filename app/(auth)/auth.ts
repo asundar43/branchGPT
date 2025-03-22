@@ -88,15 +88,13 @@ export const {
       return url;
     },
     async signIn({ user, account }) {
+      // For Google sign-in, create user if they don't exist
       if (account?.provider === 'google') {
         const users = await getUser(user.email!);
         if (users.length === 0) {
-          // Create new user but don't redirect yet
           const randomPassword = generateId(32);
           await createUser(user.email!, randomPassword);
         }
-        // Let the user authenticate first, then handle subscription in redirect
-        return true;
       }
       return true;
     },
