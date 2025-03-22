@@ -16,7 +16,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { chatModels } from '@/lib/ai/models';
 import { cn } from '@/lib/utils';
-import { useSession } from 'next-auth/react';
 
 import { CheckCircleFillIcon, ChevronDownIcon } from './icons';
 
@@ -32,7 +31,6 @@ export function ModelSelector({
   const [optimisticModelId, setOptimisticModelId] =
     useOptimistic(selectedModelId);
   const router = useRouter();
-  const { data: session } = useSession();
 
   const selectedChatModel = useMemo(
     () => chatModels.find((chatModel) => chatModel.id === optimisticModelId),
@@ -52,32 +50,12 @@ export function ModelSelector({
     return groups;
   }, []);
 
-  const handleModelSelect = async (modelId: string) => {
+  const handleModelSelect = (modelId: string) => {
     const model = chatModels.find((m) => m.id === modelId);
-    
-    // If model is premium and user is in free trial, redirect to pricing
     if (model?.isPremium && isFreeTrial) {
       router.push('/pricing');
       return;
     }
-
-    // If model is premium, verify subscription status
-    if (model?.isPremium) {
-      try {
-        const response = await fetch('/api/subscription/status');
-        const { hasActiveSubscription } = await response.json();
-        
-        if (!hasActiveSubscription) {
-          router.push('/pricing');
-          return;
-        }
-      } catch (error) {
-        console.error('Error checking subscription status:', error);
-        router.push('/pricing');
-        return;
-      }
-    }
-    
     setOpen(false);
 
     startTransition(() => {
@@ -107,8 +85,8 @@ export function ModelSelector({
               {category}
             </DropdownMenuLabel>
             {models.map((model) => {
-              const { id, freeTrialAvailable, isPremium } = model;
-              const isDisabled = (isFreeTrial && !freeTrialAvailable) || (isPremium && isFreeTrial);
+              const { id, freeTrialAvailable } = model;
+              const isDisabled = isFreeTrial && !freeTrialAvailable;
 
               return (
                 <DropdownMenuItem

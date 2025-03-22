@@ -120,9 +120,8 @@ export function Pricing() {
     if (!session?.user?.id) {
       toast({
         type: 'error',
-        description: 'Please sign in to start your free trial',
+        description: 'Please wait while we finish setting up your account...',
       });
-      router.push('/auth/login');
       return;
     }
 
