@@ -58,23 +58,6 @@ export const {
         return `${baseUrl}/chat?success=true`;
       }
 
-      // Check subscription status for chat access
-      if (url.includes('/chat')) {
-        try {
-          const session = await auth();
-          if (!session?.user?.id) {
-            return `${baseUrl}/login`;
-          }
-          const hasSubscription = await hasActiveSubscription(session.user.id);
-          if (!hasSubscription) {
-            return `${baseUrl}/pricing`;
-          }
-        } catch (error) {
-          console.error('Error checking subscription:', error);
-          return `${baseUrl}/pricing`;
-        }
-      }
-      
       // Handle pricing page redirects
       if (url.includes('/pricing')) {
         return `${baseUrl}/pricing`;
@@ -94,6 +77,19 @@ export const {
         if (users.length === 0) {
           const randomPassword = generateId(32);
           await createUser(user.email!, randomPassword);
+        }
+        // Check subscription status for Google users
+        try {
+          const existingUser = await getUser(user.email!);
+          if (existingUser.length > 0) {
+            const hasSubscription = await hasActiveSubscription(existingUser[0].id);
+            if (!hasSubscription) {
+              return '/pricing';
+            }
+          }
+        } catch (error) {
+          console.error('Error checking subscription:', error);
+          return '/pricing';
         }
       }
       return true;
