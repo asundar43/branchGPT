@@ -4,7 +4,7 @@ import Credentials from 'next-auth/providers/credentials';
 import Google from 'next-auth/providers/google';
 import { generateId } from 'ai';
 
-import { getUser, createUser } from '@/lib/db/queries';
+import { getUser, createUser, hasActiveSubscription } from '@/lib/db/queries';
 
 import { authConfig } from './auth.config';
 
@@ -57,15 +57,27 @@ export const {
       if (url.includes('success=true')) {
         return `${baseUrl}/chat?success=true`;
       }
+
+      // Check subscription status for chat access
+      if (url.includes('/chat')) {
+        try {
+          const session = await auth();
+          if (!session?.user?.id) {
+            return `${baseUrl}/login`;
+          }
+          const hasSubscription = await hasActiveSubscription(session.user.id);
+          if (!hasSubscription) {
+            return `${baseUrl}/pricing`;
+          }
+        } catch (error) {
+          console.error('Error checking subscription:', error);
+          return `${baseUrl}/pricing`;
+        }
+      }
       
       // Handle pricing page redirects
       if (url.includes('/pricing')) {
         return `${baseUrl}/pricing`;
-      }
-
-      // Handle chat redirects
-      if (url.includes('/chat')) {
-        return `${baseUrl}/chat`;
       }
 
       // Default to the original URL with baseUrl
@@ -81,6 +93,18 @@ export const {
         if (users.length === 0) {
           const randomPassword = generateId(32);
           await createUser(user.email!, randomPassword);
+          return '/pricing';
+        }
+        
+        // Check subscription for existing Google users
+        try {
+          const hasSubscription = await hasActiveSubscription(users[0].id);
+          if (!hasSubscription) {
+            return '/pricing';
+          }
+          return '/chat';
+        } catch (error) {
+          console.error('Error checking subscription:', error);
           return '/pricing';
         }
       }

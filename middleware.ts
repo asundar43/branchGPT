@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { auth } from '@/app/(auth)/auth';
 
 export const config = {
   matcher: [
@@ -10,13 +9,6 @@ export const config = {
 };
 
 export async function middleware(request: NextRequest) {
-  const session = await auth();
-
-  // Must be authenticated to access chat
-  if (!session?.user?.id) {
-    return NextResponse.redirect(new URL('/login', request.url));
-  }
-
   const response = NextResponse.next();
 
   // Add CSP headers with broader permissions for required services
