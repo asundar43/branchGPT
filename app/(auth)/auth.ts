@@ -5,11 +5,13 @@ import Google from 'next-auth/providers/google';
 import { generateId } from 'ai';
 
 import { getUser, createUser, hasActiveSubscription, startFreeTrial, checkFreeTrialStatus } from '@/lib/db/queries';
+import { user } from '@/lib/db/schema';
 
 import { authConfig } from './auth.config';
 
 interface User extends NextAuthUser {
   isNewUser?: boolean;
+  id: string;
 }
 
 interface ExtendedSession extends Session {
@@ -68,29 +70,18 @@ export const {
         const users = await getUser(user.email!);
         if (users.length === 0) {
           const randomPassword = generateId(32);
-          await createUser(user.email!, randomPassword);
-          // Start free trial for new users
-          const newUsers = await getUser(user.email!);
-          if (newUsers.length > 0) {
-            await startFreeTrial(newUsers[0].id);
+          const [newUser] = await createUser(user.email!, randomPassword);
+          if (!newUser) {
+            throw new Error('Failed to create user');
           }
+          user.id = newUser.id;
+          // Start free trial for new user
+          await startFreeTrial(newUser.id);
+          return true;
         }
-        // Check subscription status for Google users
-        try {
-          const existingUser = await getUser(user.email!);
-          if (existingUser.length > 0) {
-            const hasSubscription = await hasActiveSubscription(existingUser[0].id);
-            if (!hasSubscription) {
-              const trialStatus = await checkFreeTrialStatus(existingUser[0].id);
-              if (!trialStatus.isActive) {
-                return '/pricing';
-              }
-            }
-          }
-        } catch (error) {
-          console.error('Error checking subscription:', error);
-          return '/pricing';
-        }
+        // Set the user ID from the existing user
+        user.id = users[0].id;
+        return true;
       }
       return true;
     },
