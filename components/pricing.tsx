@@ -117,14 +117,6 @@ export function Pricing() {
   };
 
   const handleStartTrial = async () => {
-    if (!session?.user?.id) {
-      toast({
-        type: 'error',
-        description: 'Please wait while we finish setting up your account...',
-      });
-      return;
-    }
-
     try {
       setIsLoading(true);
       const response = await fetch('/api/free-trial/start', {
