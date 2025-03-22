@@ -100,6 +100,24 @@ export default function LandingPage() {
               </Button>
             </Link>
           </div>
+
+          {/* Demo Video Section */}
+          <div className="mt-16 relative">
+            <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-3xl blur opacity-20" />
+            <div className="relative rounded-3xl overflow-hidden bg-black/50 backdrop-blur-sm border border-white/10">
+              <video 
+                className="w-full rounded-3xl"
+                controls
+                autoPlay
+                muted
+                loop
+                playsInline
+              >
+                <source src="/images/branchGPTdemo.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          </div>
         </div>
 
         {/* Features Section */}
