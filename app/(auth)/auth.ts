@@ -1,7 +1,6 @@
 import { compare } from 'bcrypt-ts';
 import NextAuth, { type User as NextAuthUser, type Session } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
-import Google from 'next-auth/providers/google';
 import { generateId } from 'ai';
 
 import { getUser, createUser, hasActiveSubscription, startFreeTrial, checkFreeTrialStatus } from '@/lib/db/queries';
@@ -24,79 +23,81 @@ export const {
 } = NextAuth({
   ...authConfig,
   providers: [
-    Google({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    }),
     Credentials({
       credentials: {},
       async authorize({ email, password }: any) {
+        console.log('Credentials authorize:', { email });
         const users = await getUser(email);
-        if (users.length === 0) return null;
+        if (users.length === 0) {
+          console.log('No user found for credentials');
+          return null;
+        }
         const passwordsMatch = await compare(password, users[0].password!);
-        if (!passwordsMatch) return null;
+        if (!passwordsMatch) {
+          console.log('Password mismatch');
+          return null;
+        }
+        console.log('Credentials auth successful, user ID:', users[0].id);
         return users[0] as any;
       },
     }),
   ],
   callbacks: {
     async jwt({ token, user, account }) {
-      if (user) {
+      console.log('JWT callback:', { 
+        tokenId: token.id, 
+        userId: user?.id, 
+        provider: account?.provider 
+      });
+      
+      if (user?.id) {
         token.id = user.id;
+        console.log('Setting token.id from user.id:', user.id);
       }
+      
       return token;
     },
     async session({ session, token }: { session: ExtendedSession; token: any }) {
-      if (session.user) {
+      console.log('Session callback:', { 
+        sessionUserId: session.user?.id, 
+        tokenId: token.id 
+      });
+      
+      if (session.user && token.id) {
         session.user.id = token.id as string;
+        console.log('Setting session.user.id from token.id:', token.id);
       }
+      
       return session;
     },
     async redirect({ url, baseUrl }) {
-      // If the url is relative, allow it
-      if (url.startsWith('/')) return url;
+      console.log('Redirect callback:', { url, baseUrl });
+      
+      // If the url is relative, preserve it
+      if (url.startsWith('/')) {
+        return `${baseUrl}${url}`;
+      }
+      
       // If the url is from our domain, allow it
       if (url.startsWith(baseUrl)) return url;
+      
       // If there's an error, redirect to pricing
-      if (url.includes('error=')) return '/pricing';
-      // Otherwise, redirect to the pricing page
-      return '/pricing';
+      if (url.includes('error=')) return `${baseUrl}/pricing`;
+      
+      // For all other cases, go to /chat
+      return `${baseUrl}/chat`;
     },
-    async signIn({ user, account }) {
-      // For Google sign-in, create user if they don't exist
-      if (account?.provider === 'google') {
-        const users = await getUser(user.email!);
-        if (users.length === 0) {
-          const randomPassword = generateId(32);
-          await createUser(user.email!, randomPassword);
-          // Start free trial for new users
-          const newUsers = await getUser(user.email!);
-          if (newUsers.length > 0) {
-            await startFreeTrial(newUsers[0].id);
-            return '/chat'; // New users with trial go straight to chat
-          }
-        }
-
-        // Check subscription status for existing Google users
-        try {
-          const existingUser = await getUser(user.email!);
-          if (existingUser.length > 0) {
-            const hasSubscription = await hasActiveSubscription(existingUser[0].id);
-            if (hasSubscription) {
-              return '/chat'; // Users with active subscription go to chat
-            }
-            const trialStatus = await checkFreeTrialStatus(existingUser[0].id);
-            if (trialStatus.isActive) {
-              return '/chat'; // Users with active trial go to chat
-            }
-            return '/pricing'; // Only show pricing if no active subscription or trial
-          }
-        } catch (error) {
-          console.error('Error checking subscription:', error);
-          return '/pricing';
-        }
-      }
+    async signIn({ user }) {
+      console.log('SignIn callback:', { 
+        email: user.email, 
+        userId: user.id 
+      });
+      
       return true;
     },
+  },
+  pages: {
+    signIn: '/auth/login',
+    error: '/pricing',
   },
 });

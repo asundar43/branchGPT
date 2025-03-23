@@ -41,6 +41,10 @@ class AuthPage {
   async expectToastToContain(text: string) {
     await expect(this.page.getByTestId('toast')).toContainText(text);
   }
+
+  async clickGoogleSignIn() {
+    await this.page.getByRole('button', { name: 'Sign in with Google' }).click();
+  }
 }
 
 test.describe
@@ -70,6 +74,28 @@ test.describe
     test('log into account', async ({ page }) => {
       await authPage.login(testEmail, testPassword);
 
+      await page.waitForURL('/');
+      await expect(page).toHaveURL('/');
+      await expect(page.getByPlaceholder('Send a message...')).toBeVisible();
+    });
+
+    test('google sign in with non-existent account creates account and logs in', async ({ page }) => {
+      await authPage.gotoLogin();
+      await authPage.clickGoogleSignIn();
+      
+      await page.waitForURL('/');
+      await expect(page).toHaveURL('/');
+      await expect(page.getByPlaceholder('Send a message...')).toBeVisible();
+    });
+
+    test('google sign in with existing account works', async ({ page }) => {
+      // First register a user
+      await authPage.register(testEmail, testPassword);
+      
+      // Then try Google sign in with same email
+      await authPage.gotoLogin();
+      await authPage.clickGoogleSignIn();
+      
       await page.waitForURL('/');
       await expect(page).toHaveURL('/');
       await expect(page.getByPlaceholder('Send a message...')).toBeVisible();

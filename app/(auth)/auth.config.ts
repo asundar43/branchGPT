@@ -13,12 +13,19 @@ export const authConfig = {
   ],
   callbacks: {
     async authorized({ auth, request: { nextUrl } }) {
+      console.log('Authorized callback:', { 
+        isLoggedIn: !!auth?.user,
+        pathname: nextUrl.pathname,
+        userId: auth?.user?.id 
+      });
+
       const isLoggedIn = !!auth?.user;
       const isOnDashboard = nextUrl.pathname.startsWith('/chat');
       const isOnAuth = nextUrl.pathname.startsWith('/auth');
       const isOnLanding = nextUrl.pathname === '/';
       const isOnPricing = nextUrl.pathname === '/pricing';
       const isOnFreeTrial = nextUrl.pathname.startsWith('/api/free-trial');
+      const isOnAuthCallback = nextUrl.pathname.startsWith('/api/auth/callback');
 
       // Allow access to landing page
       if (isOnLanding) return true;
@@ -26,9 +33,12 @@ export const authConfig = {
       // Allow access to free trial API endpoint for logged-in users
       if (isOnFreeTrial && isLoggedIn) return true;
 
+      // Allow auth callbacks for credential provider
+      if (isOnAuthCallback) return true;
+
       // Redirect logged-in users away from auth pages
       if (isLoggedIn && isOnAuth) {
-        return Response.redirect(new URL('/pricing', nextUrl));
+        return Response.redirect(new URL('/chat', nextUrl));
       }
 
       // Allow access to auth pages for non-logged-in users
@@ -36,7 +46,7 @@ export const authConfig = {
 
       // Protect dashboard routes
       if (isOnDashboard) {
-        if (!isLoggedIn || !auth.user?.id) {
+        if (!isLoggedIn || !auth?.user?.id) {
           return Response.redirect(new URL('/auth/login', nextUrl));
         }
         
@@ -56,7 +66,7 @@ export const authConfig = {
         }
       }
 
-      // Allow access to pricing page for logged-in users
+      // Allow access to pricing page for everyone
       if (isOnPricing) {
         return true;
       }
