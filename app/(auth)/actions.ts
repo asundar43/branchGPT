@@ -74,22 +74,7 @@ export const register = async (
       redirect: false,
     });
 
-    // Check subscription status before redirecting
-    const response = await fetch('/api/free-trial');
-    const trialStatus = await response.json();
-    
-    if (trialStatus.isActive) {
-      return { status: 'success', redirectUrl: '/chat' };
-    }
-
-    const subscriptionResponse = await fetch('/api/subscription');
-    const subscriptionData = await subscriptionResponse.json();
-    
-    if (subscriptionData.hasActiveSubscription) {
-      return { status: 'success', redirectUrl: '/chat' };
-    }
-
-    // If no active subscription or trial, redirect to pricing
+    // Redirect to pricing page after successful registration
     return { status: 'success', redirectUrl: '/pricing' };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -101,5 +86,5 @@ export const register = async (
 };
 
 export async function handleGoogleSignIn() {
-  return signIn('google', { callbackUrl: '/pricing' });
+  return signIn('google', { callbackUrl: '/chat' });
 }

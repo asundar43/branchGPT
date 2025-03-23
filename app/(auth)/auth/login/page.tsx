@@ -42,19 +42,10 @@ export default function LoginPage() {
           const response = await fetch('/api/free-trial');
           const trialStatus = await response.json();
           
-          // If user has an active trial or subscription, redirect to chat
-          if (trialStatus.isActive) {
-            router.push('/chat');
+          if (!trialStatus.isActive) {
+            router.push('/pricing');
           } else {
-            // Check for active subscription
-            const subscriptionResponse = await fetch('/api/subscription');
-            const subscriptionData = await subscriptionResponse.json();
-            
-            if (subscriptionData.hasActiveSubscription) {
-              router.push('/chat');
-            } else {
-              router.push('/pricing');
-            }
+            router.push('/chat');
           }
           router.refresh();
         } catch (error) {

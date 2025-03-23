@@ -69,14 +69,34 @@ export const {
         if (users.length === 0) {
           const randomPassword = generateId(32);
           await createUser(user.email!, randomPassword);
-          // Let the regular flow handle the trial and subscription checks
-          return '/pricing';
+          // Start free trial for new users
+          const newUsers = await getUser(user.email!);
+          if (newUsers.length > 0) {
+            await startFreeTrial(newUsers[0].id);
+            return '/chat'; // New users with trial go straight to chat
+          }
         }
 
-        // For existing users, let the regular flow handle the checks
-        return '/pricing';
+        // Check subscription status for existing Google users
+        try {
+          const existingUser = await getUser(user.email!);
+          if (existingUser.length > 0) {
+            const hasSubscription = await hasActiveSubscription(existingUser[0].id);
+            if (hasSubscription) {
+              return '/chat'; // Users with active subscription go to chat
+            }
+            const trialStatus = await checkFreeTrialStatus(existingUser[0].id);
+            if (trialStatus.isActive) {
+              return '/chat'; // Users with active trial go to chat
+            }
+            return '/pricing'; // Only show pricing if no active subscription or trial
+          }
+        } catch (error) {
+          console.error('Error checking subscription:', error);
+          return '/pricing';
+        }
       }
-      return '/pricing';
+      return true;
     },
   },
 });

@@ -475,6 +475,6 @@ export async function incrementChatCount(userId: string) {
 }
 
 export async function isAllowedModel(model: string): Promise<boolean> {
-  const allowedModels = ['gpt-4', 'gpt-4-mini', 'dalle-2', 'o3-mini-high'];
+  const allowedModels = ['chat-model-small', 'chat-model-large', 'chat-model-reasoning'];
   return allowedModels.includes(model);
 }

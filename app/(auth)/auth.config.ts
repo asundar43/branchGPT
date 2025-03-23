@@ -27,22 +27,8 @@ export const authConfig = {
       if (isOnFreeTrial && isLoggedIn) return true;
 
       // Redirect logged-in users away from auth pages
-      if (isLoggedIn && isOnAuth && auth.user?.id) {
-        // Check if user has active subscription or trial
-        try {
-          const hasSubscription = await hasActiveSubscription(auth.user.id);
-          if (hasSubscription) {
-            return Response.redirect(new URL('/chat', nextUrl));
-          }
-          const trialStatus = await checkFreeTrialStatus(auth.user.id);
-          if (trialStatus.isActive) {
-            return Response.redirect(new URL('/chat', nextUrl));
-          }
-          return Response.redirect(new URL('/pricing', nextUrl));
-        } catch (error) {
-          console.error('Error checking subscription:', error);
-          return Response.redirect(new URL('/pricing', nextUrl));
-        }
+      if (isLoggedIn && isOnAuth) {
+        return Response.redirect(new URL('/pricing', nextUrl));
       }
 
       // Allow access to auth pages for non-logged-in users
