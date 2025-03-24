@@ -12,9 +12,7 @@ export const metadata: Metadata = {
   title: 'branchGPT',
   description: 'Explore different AI responses without starting over. Branch your chats, explore multiple angles, and never lose your train of thought.',
   icons: {
-    icon: '/icon.svg',
-    shortcut: '/icon.svg',
-    apple: '/icon.svg',
+    icon: '/favicon.ico',
   },
   openGraph: {
     images: [
