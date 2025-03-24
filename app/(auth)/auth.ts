@@ -1,6 +1,7 @@
 import { compare } from 'bcrypt-ts';
 import NextAuth, { type User as NextAuthUser, type Session } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
+import Google from 'next-auth/providers/google';
 import { generateId } from 'ai';
 
 import { getUser, createUser, hasActiveSubscription, startFreeTrial, checkFreeTrialStatus } from '@/lib/db/queries';
@@ -23,6 +24,18 @@ export const {
 } = NextAuth({
   ...authConfig,
   providers: [
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      profile(profile) {
+        return {
+          id: profile.sub,
+          name: profile.name,
+          email: profile.email,
+          image: profile.picture,
+        };
+      },
+    }),
     Credentials({
       credentials: {},
       async authorize({ email, password }: any) {
@@ -87,11 +100,27 @@ export const {
       // For all other cases, go to /chat
       return `${baseUrl}/chat`;
     },
-    async signIn({ user }) {
+    async signIn({ user, account }) {
       console.log('SignIn callback:', { 
         email: user.email, 
-        userId: user.id 
+        userId: user.id,
+        provider: account?.provider 
       });
+      
+      // For Google users, ensure they exist in our database
+      if (account?.provider === 'google') {
+        const existingUsers = await getUser(user.email!);
+        if (existingUsers.length === 0) {
+          // Create new user with Google data
+          if (!user.email) {
+            throw new Error('Email is required for Google sign in');
+          }
+          const newUser = await createUser(user.email);
+          user.id = newUser[0].id;
+        } else {
+          user.id = existingUsers[0].id;
+        }
+      }
       
       return true;
     },

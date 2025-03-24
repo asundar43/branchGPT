@@ -36,12 +36,15 @@ export async function getUser(email: string): Promise<Array<User>> {
   }
 }
 
-export async function createUser(email: string, password: string) {
-  const salt = genSaltSync(10);
-  const hash = hashSync(password, salt);
-
+export async function createUser(email: string, password: string | null = null) {
   try {
-    return await db.insert(user).values({ email, password: hash });
+    const values: { email: string; password?: string } = { email };
+    if (password) {
+      const salt = genSaltSync(10);
+      const hash = hashSync(password, salt);
+      values.password = hash;
+    }
+    return await db.insert(user).values(values).returning();
   } catch (error) {
     console.error('Failed to create user in database');
     throw error;
