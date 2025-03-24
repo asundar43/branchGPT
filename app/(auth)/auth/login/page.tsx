@@ -43,6 +43,11 @@ export default function LoginPage() {
           const response = await fetch('/api/free-trial');
           const trialStatus = await response.json();
           
+          if (trialStatus.hasSubscription) {
+            router.push('/chat');
+            return;
+          }
+          
           if (!trialStatus.isActive) {
             router.push('/pricing');
           } else {
