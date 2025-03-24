@@ -20,8 +20,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: '/logos/logo.png',
-        width: 800,
-        height: 600,
+        width: 66,
+        height: 64,
         alt: 'branchGPT Logo',
       },
     ],
