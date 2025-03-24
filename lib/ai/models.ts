@@ -13,7 +13,7 @@ export const chatModels: Array<ChatModel> = [
   // General Purpose Models
   {
     id: 'chat-model-small',
-    name: 'GPT-4 Mini',
+    name: 'GPT-4o Mini',
     description: 'Fast and efficient for everyday tasks and quick responses',
     category: 'General Purpose',
     freeTrialAvailable: true,
@@ -21,11 +21,11 @@ export const chatModels: Array<ChatModel> = [
   },
   {
     id: 'chat-model-large',
-    name: 'GPT-4',
+    name: 'GPT-4o',
     description: 'Most capable model for complex tasks and detailed analysis',
     category: 'General Purpose',
     freeTrialAvailable: true,
-    isPremium: true,
+    isPremium: false,
   },
   {
     id: 'chat-model-gpt45',
@@ -63,7 +63,7 @@ export const chatModels: Array<ChatModel> = [
   // Reasoning & Logic Models
   {
     id: 'chat-model-reasoning',
-    name: 'O3 Mini with Reasoning',
+    name: 'o3 Mini High',
     description: 'Enhanced reasoning capabilities for logical problem-solving',
     category: 'Reasoning & Logic',
     freeTrialAvailable: true,
