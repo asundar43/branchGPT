@@ -4,8 +4,34 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import './styles.css'
 import { BrandIcon } from '@/components/icons'
+import { useEffect, useRef } from 'react'
 
 export default function LandingPage() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            video.load();
+            observer.unobserve(video);
+          }
+        });
+      },
+      { rootMargin: '50px' }
+    );
+
+    observer.observe(video);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-black">
       {/* Animated background */}
@@ -198,14 +224,19 @@ export default function LandingPage() {
             <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-3xl blur opacity-20" />
             <div className="relative rounded-3xl overflow-hidden bg-black/50 backdrop-blur-sm border border-white/10">
               <video 
+                ref={videoRef}
                 className="w-full rounded-3xl"
                 controls
                 autoPlay
                 muted
                 loop
                 playsInline
+                preload="metadata"
+                poster="/images/branchGPTdemo-poster.jpg"
               >
+                <source src="/images/branchGPTdemo.webm" type="video/webm" />
                 <source src="/images/branchGPTdemo.mp4" type="video/mp4" />
+                <source src="/images/branchGPTdemo-mobile.mp4" type="video/mp4" media="(max-width: 768px)" />
                 Your browser does not support the video tag.
               </video>
             </div>
