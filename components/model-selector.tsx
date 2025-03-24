@@ -85,8 +85,8 @@ export function ModelSelector({
               {category}
             </DropdownMenuLabel>
             {models.map((model) => {
-              const { id, freeTrialAvailable } = model;
-              const isDisabled = isFreeTrial && !freeTrialAvailable;
+              const { id, isPremium } = model;
+              const isDisabled = isFreeTrial && isPremium;
 
               return (
                 <DropdownMenuItem

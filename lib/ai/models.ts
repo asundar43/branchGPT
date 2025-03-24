@@ -33,7 +33,7 @@ export const chatModels: Array<ChatModel> = [
     description: 'Enhanced capabilities with improved performance and reasoning',
     category: 'General Purpose',
     freeTrialAvailable: false,
-    isPremium: false,
+    isPremium: true,
   },
   // Research & Analysis Models
   {
@@ -42,7 +42,7 @@ export const chatModels: Array<ChatModel> = [
     description: 'Balanced performance for research and analysis',
     category: 'Research & Analysis',
     freeTrialAvailable: false,
-    isPremium: false,
+    isPremium: true,
   },
   {
     id: 'chat-model-sonar-pro',
@@ -50,7 +50,7 @@ export const chatModels: Array<ChatModel> = [
     description: 'Advanced capabilities for deep research and analysis',
     category: 'Research & Analysis',
     freeTrialAvailable: false,
-    isPremium: false,
+    isPremium: true,
   },
   {
     id: 'chat-model-sonar-deep',
@@ -58,7 +58,7 @@ export const chatModels: Array<ChatModel> = [
     description: 'Specialized for in-depth research and comprehensive analysis',
     category: 'Research & Analysis',
     freeTrialAvailable: false,
-    isPremium: false,
+    isPremium: true,
   },
   // Reasoning & Logic Models
   {
@@ -75,6 +75,6 @@ export const chatModels: Array<ChatModel> = [
     description: 'Advanced reasoning and analytical capabilities for complex problem-solving',
     category: 'Reasoning & Logic',
     freeTrialAvailable: false,
-    isPremium: false,
+    isPremium: true,
   },
 ];
