@@ -42,8 +42,10 @@ export const {
         console.log('Credentials authorize:', { email });
         const users = await getUser(email);
         if (users.length === 0) {
-          console.log('No user found for credentials');
-          return null;
+          console.log('No user found, creating new account');
+          // Create new user with provided credentials
+          const newUsers = await createUser(email, password);
+          return newUsers[0] as any;
         }
         const passwordsMatch = await compare(password, users[0].password!);
         if (!passwordsMatch) {

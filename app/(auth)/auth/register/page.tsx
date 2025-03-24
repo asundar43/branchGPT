@@ -25,9 +25,7 @@ export default function RegisterPage() {
   );
 
   useEffect(() => {
-    if (state.status === 'user_exists') {
-      toast({ type: 'error', description: 'Account already exists!' });
-    } else if (state.status === 'failed') {
+    if (state.status === 'failed') {
       toast({ type: 'error', description: 'Failed to create account!' });
     } else if (state.status === 'invalid_data') {
       toast({
@@ -36,9 +34,9 @@ export default function RegisterPage() {
       });
     } else if (state.status === 'success') {
       setIsSuccessful(true);
-      toast({ type: 'success', description: 'Account created successfully!' });
+      toast({ type: 'success', description: 'Successfully signed in!' });
       
-      // Redirect to pricing page
+      // Redirect based on the provided URL
       if (state.redirectUrl) {
         router.push(state.redirectUrl);
       }
