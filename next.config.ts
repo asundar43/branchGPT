@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
         hostname: 'avatar.vercel.sh',
       },
     ],
+    unoptimized: true,
   },
 };
 

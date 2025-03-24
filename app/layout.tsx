@@ -16,6 +16,16 @@ export const metadata: Metadata = {
     shortcut: '/icon.svg',
     apple: '/icon.svg',
   },
+  openGraph: {
+    images: [
+      {
+        url: '/logos/logo.png',
+        width: 800,
+        height: 600,
+        alt: 'branchGPT Logo',
+      },
+    ],
+  },
 };
 
 export const viewport = {

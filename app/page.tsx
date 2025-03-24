@@ -167,8 +167,7 @@ export default function LandingPage() {
             <div className="absolute -top-8 -right-8 w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full filter blur-2xl opacity-20" />
           </div>
           <p className="text-xl mb-12 text-neutral-400 leading-relaxed max-w-2xl mx-auto">
-            Experience the future of AI conversations. BranchGPT helps you explore multiple paths simultaneously, 
-            making complex problem-solving and creative exploration more efficient than ever.
+            Explore different AI responses without starting over. Branch your chats, explore multiple angles, and never lose your train of thought.
           </p>
           <div className="flex items-center justify-center">
             <div className="inline-flex flex-col items-center">
