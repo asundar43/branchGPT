@@ -46,10 +46,10 @@ export default function TermsPage() {
             <section>
               <h2 className="text-2xl font-semibold mb-4 text-white/80">Definitions</h2>
               <ul className="list-disc pl-6 space-y-2">
-                <li>"Service" refers to BranchGPT and its features</li>
-                <li>"User" refers to any individual or entity using our Service</li>
-                <li>"Content" includes all information, text, and materials available through the Service</li>
-                <li>"Account" refers to your registered account with BranchGPT</li>
+                <li>&ldquo;Service&rdquo; refers to BranchGPT and its features</li>
+                <li>&ldquo;User&rdquo; refers to any individual or entity using our Service</li>
+                <li>&ldquo;Content&rdquo; includes all information, text, and materials available through the Service</li>
+                <li>&ldquo;Account&rdquo; refers to your registered account with BranchGPT</li>
               </ul>
             </section>
 
@@ -101,7 +101,7 @@ export default function TermsPage() {
             <section>
               <h2 className="text-2xl font-semibold mb-4 text-white/80">Changes to Terms</h2>
               <p className="mb-4">
-                We reserve the right to modify or replace these Terms at any time. We will notify you of any changes by posting the new Terms on this page and updating the "Last Updated" date.
+                We reserve the right to modify or replace these Terms at any time. We will notify you of any changes by posting the new Terms on this page and updating the &ldquo;Last Updated&rdquo; date.
               </p>
               <p className="text-sm text-neutral-500">Last Updated: March 23, 2025</p>
             </section>
