@@ -83,7 +83,7 @@ export async function POST(request: Request) {
     }
 
     // Check if model is allowed for free trial
-    const isModelAllowed = await isAllowedModel(selectedChatModel);
+    const isModelAllowed = await isAllowedModel(selectedChatModel, session.user.id);
     if (!isModelAllowed) {
       return new Response(
         JSON.stringify({

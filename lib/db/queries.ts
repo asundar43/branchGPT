@@ -477,7 +477,22 @@ export async function incrementChatCount(userId: string) {
   }
 }
 
-export async function isAllowedModel(model: string): Promise<boolean> {
-  const allowedModels = ['chat-model-small', 'chat-model-large', 'chat-model-reasoning'];
-  return allowedModels.includes(model);
+export async function isAllowedModel(model: string, userId?: string): Promise<boolean> {
+  // If no userId provided, only allow free trial models
+  if (!userId) {
+    const freeTrialModels = ['chat-model-small', 'chat-model-large', 'chat-model-reasoning'];
+    return freeTrialModels.includes(model);
+  }
+
+  // Check if user has active subscription
+  const hasSubscription = await hasActiveSubscription(userId);
+  
+  // If user has subscription, all models are allowed
+  if (hasSubscription) {
+    return true;
+  }
+
+  // For users without subscription, only allow free trial models
+  const freeTrialModels = ['chat-model-small', 'chat-model-large', 'chat-model-reasoning'];
+  return freeTrialModels.includes(model);
 }

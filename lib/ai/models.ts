@@ -29,7 +29,7 @@ export const chatModels: Array<ChatModel> = [
   },
   {
     id: 'chat-model-gpt45',
-    name: 'GPT-4.5',
+    name: 'GPT-4.5 Preview',
     description: 'Enhanced capabilities with improved performance and reasoning',
     category: 'General Purpose',
     freeTrialAvailable: false,
