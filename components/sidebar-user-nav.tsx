@@ -54,8 +54,18 @@ export function SidebarUserNav({ user }: { user: User }) {
               className="cursor-pointer"
               onSelect={async () => {
                 try {
+                  // Check subscription status first
+                  const response = await fetch('/api/free-trial');
+                  const data = await response.json();
+
+                  if (!data.hasSubscription) {
+                    // Redirect to pricing page if no subscription
+                    window.location.href = '/pricing';
+                    return;
+                  }
+
                   console.log('Creating portal session for user:', user.id);
-                  const response = await fetch('/api/create-portal-session', {
+                  const portalResponse = await fetch('/api/create-portal-session', {
                     method: 'POST',
                     headers: {
                       'Content-Type': 'application/json',
@@ -65,16 +75,16 @@ export function SidebarUserNav({ user }: { user: User }) {
                     }),
                   });
 
-                  const data = await response.json();
-                  console.log('Portal session response:', data);
+                  const portalData = await portalResponse.json();
+                  console.log('Portal session response:', portalData);
 
-                  if (!response.ok) {
-                    throw new Error(data.error || 'Failed to create portal session');
+                  if (!portalResponse.ok) {
+                    throw new Error(portalData.error || 'Failed to create portal session');
                   }
 
-                  if (data.url) {
-                    console.log('Redirecting to portal URL:', data.url);
-                    window.location.href = data.url;
+                  if (portalData.url) {
+                    console.log('Redirecting to portal URL:', portalData.url);
+                    window.location.href = portalData.url;
                   } else {
                     throw new Error('No portal URL received');
                   }
