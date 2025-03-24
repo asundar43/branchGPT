@@ -23,6 +23,24 @@
   100% { transform: translate(0, 0) scale(1); }
 }
 
+@keyframes shine {
+  0% {
+    transform: translateX(-200%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+@keyframes shine-fast {
+  0% {
+    transform: translateX(-200%) skewX(-30deg);
+  }
+  100% {
+    transform: translateX(200%) skewX(-30deg);
+  }
+}
+
 .animate-blob {
   animation: blob 4s infinite;
 }
@@ -52,6 +70,14 @@
 .animate-dash-30s {
   animation: dash 6s linear infinite, glow 3s ease-in-out infinite;
   animation-delay: 0.75s;
+}
+
+.animate-shine {
+  animation: shine 3s infinite;
+}
+
+.animate-shine-fast {
+  animation: shine-fast 1.5s infinite;
 }
 
 path {

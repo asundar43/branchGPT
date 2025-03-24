@@ -93,26 +93,40 @@ export default function LandingPage() {
             Experience the future of AI conversations. BranchGPT helps you explore multiple paths simultaneously, 
             making complex problem-solving and creative exploration more efficient than ever.
           </p>
-          <div className="flex items-center justify-center gap-4">
-            <Link href="/auth/register">
-              <Button size="lg" className="bg-white text-black hover:bg-white/90 transition-colors px-8 py-6 text-lg rounded-2xl">
-                Start Free Trial
-              </Button>
-            </Link>
-            <Link href="#demo">
-              <Button size="lg" variant="outline" className="text-white hover:text-white/90 hover:bg-white/10 border-white/20 transition-colors px-8 py-6 text-lg rounded-2xl">
-                Watch Demo
-              </Button>
-            </Link>
+          <div className="flex items-center justify-center">
+            <div className="inline-flex flex-col items-center">
+              <Link href="/auth/register">
+                <Button 
+                  size="lg" 
+                  className="bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:opacity-90 transition-all px-8 py-6 text-lg rounded-2xl relative overflow-hidden group shadow-lg shadow-purple-500/20"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-200%] animate-shine-fast" />
+                  Start Free Trial
+                </Button>
+              </Link>
+              <span className="text-neutral-400 text-sm mt-2">No credit card required</span>
+            </div>
           </div>
 
           {/* Social Proof */}
           <div className="mt-16 flex flex-col items-center gap-8">
             <div className="flex items-center gap-2 text-white/80">
               <div className="flex -space-x-2">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 border-2 border-black" />
-                ))}
+                <img 
+                  src="/images/matt.jpeg" 
+                  alt="Matt Steele"
+                  className="w-8 h-8 rounded-full object-cover border-2 border-black"
+                />
+                <img 
+                  src="/images/rohan.jpeg" 
+                  alt="Rohan Mathur"
+                  className="w-8 h-8 rounded-full object-cover border-2 border-black"
+                />
+                <img 
+                  src="/images/krishna.jpeg" 
+                  alt="Krishna Suresh"
+                  className="w-8 h-8 rounded-full object-cover border-2 border-black"
+                />
               </div>
               <span>Join 10,000+ users already branching their conversations</span>
             </div>
@@ -236,33 +250,37 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
-                quote: "BranchGPT has revolutionized how I approach complex problems. The ability to explore multiple solutions simultaneously is game-changing.",
-                author: "Sarah Chen",
-                role: "Software Engineer at Google",
-                avatar: "/images/testimonials/sarah.jpg"
+                quote: "BranchGPT cut my debugging time in half. I can explore multiple solutions at once and quickly find the best approach.",
+                author: "Matt Steele",
+                role: "Software Engineer at Microsoft",
+                avatar: "/images/matt.jpeg"
               },
               {
-                quote: "As a researcher, I love how BranchGPT helps me explore different hypotheses without losing track of my thought process.",
-                author: "Dr. Michael Rodriguez",
-                role: "AI Researcher",
-                avatar: "/images/testimonials/michael.jpg"
+                quote: "Perfect for managing complex projects. I can track different stakeholder requirements and project scenarios all in one place.",
+                author: "Rohan Mathur",
+                role: "Project Manager at Epic",
+                avatar: "/images/rohan.jpeg"
               },
               {
-                quote: "The branching system is intuitive and powerful. It's like having multiple AI assistants working together to solve your problems.",
-                author: "Emma Thompson",
-                role: "Product Designer",
-                avatar: "/images/testimonials/emma.jpg"
+                quote: "Game-changer for security planning. We model multiple threat scenarios simultaneously, making our response strategies more robust.",
+                author: "Krishna Suresh",
+                role: "Co-founder at VigilAI",
+                avatar: "/images/krishna.jpeg"
               }
             ].map((testimonial, i) => (
               <div key={i} className="p-8 rounded-3xl bg-white/5 backdrop-blur-lg border border-white/10">
-                <p className="text-neutral-400 mb-6">&ldquo;{testimonial.quote}&rdquo;</p>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-500" />
+                <div className="flex items-center gap-4 mb-6">
+                  <img 
+                    src={testimonial.avatar} 
+                    alt={testimonial.author}
+                    className="w-10 h-10 rounded-full object-cover border border-white/10"
+                  />
                   <div>
-                    <p className="text-white/90 font-semibold">{testimonial.author}</p>
+                    <p className="text-white/90 font-medium">{testimonial.author}</p>
                     <p className="text-neutral-400 text-sm">{testimonial.role}</p>
                   </div>
                 </div>
+                <p className="text-neutral-400">&ldquo;{testimonial.quote}&rdquo;</p>
               </div>
             ))}
           </div>
@@ -274,20 +292,20 @@ export default function LandingPage() {
           <div className="max-w-3xl mx-auto space-y-6">
             {[
               {
-                question: "How does BranchGPT work?",
-                answer: "BranchGPT allows you to create multiple conversation paths from any point in your chat. You can explore different approaches simultaneously, compare responses, and merge the best ideas into a single thread."
+                question: "How does branching work?",
+                answer: "When you're in a conversation, you can create a new branch at any point to explore a different direction. Each branch maintains its own context while preserving the original conversation flow."
               },
               {
-                question: "Is there a free trial?",
-                answer: "Yes! We offer a 14-day free trial with full access to all features. No credit card required to start."
+                question: "What AI models are available?",
+                answer: "We offer a comprehensive suite of top AI models including o3-mini-high, GPT 4.5, Grok 2, Sonar Pro, Sonar Deep Research, and more. You can choose the best model for your specific needs or compare responses across different models."
               },
               {
-                question: "Can I export my conversations?",
-                answer: "Yes, you can export your conversations in various formats including Markdown, PDF, and JSON. This makes it easy to share your work or integrate it into your existing workflow."
+                question: "Can I collaborate with others?",
+                answer: "Yes! You can share your branched conversations with team members, allowing for collaborative problem-solving and brainstorming sessions."
               },
               {
-                question: "What AI models do you use?",
-                answer: "We use state-of-the-art language models including GPT-4 and Claude. Each branch can use different models, allowing you to compare their capabilities."
+                question: "How do I get started?",
+                answer: "Simply sign up for an account, and you'll be able to start branching conversations immediately. Our intuitive interface makes it easy to explore multiple conversation paths."
               }
             ].map((faq, i) => (
               <div key={i} className="p-6 rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10">
@@ -304,11 +322,20 @@ export default function LandingPage() {
           <p className="text-xl mb-8 text-neutral-400 max-w-2xl mx-auto">
             Join thousands of users who are already experiencing the future of AI conversations.
           </p>
-          <Link href="/auth/register">
-            <Button size="lg" className="bg-white text-black hover:bg-white/90 transition-colors px-8 py-6 text-lg rounded-2xl">
-              Start Your Free Trial
-            </Button>
-          </Link>
+          <div className="flex items-center justify-center">
+            <div className="inline-flex flex-col items-center">
+              <Link href="/auth/register">
+                <Button 
+                  size="lg" 
+                  className="bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:opacity-90 transition-all px-8 py-6 text-lg rounded-2xl relative overflow-hidden group shadow-lg shadow-purple-500/20"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-200%] animate-shine-fast" />
+                  Get Started Now
+                </Button>
+              </Link>
+              <span className="text-neutral-400 text-sm mt-2">No credit card required</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
