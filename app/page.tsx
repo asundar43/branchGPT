@@ -13,38 +13,87 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-black via-neutral-950 to-neutral-900 opacity-90" />
         <div className="absolute top-0 left-0 w-full h-full">
           {/* Animated branch lines */}
-          <svg className="w-full h-full opacity-50" viewBox="0 0 100 100" preserveAspectRatio="none">
-            {/* Main branch */}
+          <svg className="w-full h-full opacity-50" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
+            {/* Hero area branches */}
             <path 
               className="animate-dash-15s stroke-[0.4] stroke-blue-500/50" 
-              d="M20,50 L40,50 Q45,50 45,45 L45,30 Q45,25 50,25 L80,25" 
+              d="M5,20 L25,20 Q30,20 30,25 L30,35 Q30,40 35,40 L85,40" 
               fill="none" 
               strokeLinecap="round"
               strokeDasharray="0.5 2"
               pathLength="1"
             />
-            {/* Branch 1 */}
             <path 
               className="animate-dash-20s stroke-[0.4] stroke-purple-500/50" 
-              d="M20,50 L40,50 Q45,50 45,55 L45,70 Q45,75 50,75 L80,75" 
+              d="M5,30 L25,30 Q30,30 30,35 L30,45 Q30,50 35,50 L85,50" 
               fill="none" 
               strokeLinecap="round"
               strokeDasharray="0.5 2"
               pathLength="1"
             />
-            {/* Branch 2 */}
+            {/* Main branches */}
+            <path 
+              className="animate-dash-15s stroke-[0.4] stroke-blue-500/50" 
+              d="M10,50 L30,50 Q35,50 35,45 L35,30 Q35,25 40,25 L90,25" 
+              fill="none" 
+              strokeLinecap="round"
+              strokeDasharray="0.5 2"
+              pathLength="1"
+            />
+            <path 
+              className="animate-dash-20s stroke-[0.4] stroke-purple-500/50" 
+              d="M10,50 L30,50 Q35,50 35,55 L35,70 Q35,75 40,75 L90,75" 
+              fill="none" 
+              strokeLinecap="round"
+              strokeDasharray="0.5 2"
+              pathLength="1"
+            />
+            {/* Additional branches for top section */}
             <path 
               className="animate-dash-25s stroke-[0.4] stroke-pink-500/50" 
-              d="M45,50 L60,50 Q65,50 65,45 L65,35 Q65,30 70,30 L80,30" 
+              d="M20,20 L40,20 Q45,20 45,25 L45,35 Q45,40 50,40 L80,40" 
               fill="none" 
               strokeLinecap="round"
               strokeDasharray="0.5 2"
               pathLength="1"
             />
-            {/* Branch 3 */}
             <path 
               className="animate-dash-30s stroke-[0.4] stroke-emerald-500/50" 
-              d="M45,50 L60,50 Q65,50 65,55 L65,65 Q65,70 70,70 L80,70" 
+              d="M20,80 L40,80 Q45,80 45,75 L45,65 Q45,60 50,60 L80,60" 
+              fill="none" 
+              strokeLinecap="round"
+              strokeDasharray="0.5 2"
+              pathLength="1"
+            />
+            {/* Additional branches for middle section */}
+            <path 
+              className="animate-dash-15s stroke-[0.4] stroke-blue-500/50" 
+              d="M35,50 L55,50 Q60,50 60,45 L60,35 Q60,30 65,30 L90,30" 
+              fill="none" 
+              strokeLinecap="round"
+              strokeDasharray="0.5 2"
+              pathLength="1"
+            />
+            <path 
+              className="animate-dash-20s stroke-[0.4] stroke-purple-500/50" 
+              d="M35,50 L55,50 Q60,50 60,55 L60,65 Q60,70 65,70 L90,70" 
+              fill="none" 
+              strokeLinecap="round"
+              strokeDasharray="0.5 2"
+              pathLength="1"
+            />
+            {/* Additional branches for bottom section */}
+            <path 
+              className="animate-dash-25s stroke-[0.4] stroke-pink-500/50" 
+              d="M50,80 L70,80 Q75,80 75,75 L75,65 Q75,60 80,60 L90,60" 
+              fill="none" 
+              strokeLinecap="round"
+              strokeDasharray="0.5 2"
+              pathLength="1"
+            />
+            <path 
+              className="animate-dash-30s stroke-[0.4] stroke-emerald-500/50" 
+              d="M50,20 L70,20 Q75,20 75,25 L75,35 Q75,40 80,40 L90,40" 
               fill="none" 
               strokeLinecap="round"
               strokeDasharray="0.5 2"
