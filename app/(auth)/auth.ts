@@ -119,6 +119,13 @@ export const {
           }
           const newUser = await createUser(user.email);
           user.id = newUser[0].id;
+          
+          // Start free trial for new Google users
+          try {
+            await startFreeTrial(newUser[0].id);
+          } catch (error) {
+            console.error('Failed to start free trial for Google user:', error);
+          }
         } else {
           user.id = existingUsers[0].id;
         }

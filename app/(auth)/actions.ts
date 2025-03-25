@@ -92,5 +92,5 @@ export const register = async (
 };
 
 export async function handleGoogleSignIn() {
-  return signIn('google', { callbackUrl: '/chat' });
+  return signIn('google', { callbackUrl: '/pricing' });
 }
