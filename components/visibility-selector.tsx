@@ -37,7 +37,7 @@ const visibilities: Array<{
     id: 'public',
     label: 'Public',
     description: 'Anyone with the link can access this chat',
-    icon: <LockIcon />,
+    icon: <Globe />,
   },
 ];
 
@@ -93,37 +93,38 @@ export function VisibilitySelector({
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="start" className="min-w-[300px] w-[120px]">
-        {visibilities.map((visibility) => (
-          <DropdownMenuItem
-            key={visibility.id}
-            onSelect={() => handleVisibilitySelect(visibility.id)}
-            className="gap-4 group/item flex flex-row justify-between items-center"
-            data-active={visibility.id === visibilityType}
-          >
-            <div className="flex flex-col gap-1 items-start">
-              {visibility.label}
-              {visibility.description && (
+        {visibilities.map((visibility) => {
+          const isDisabled = visibility.id === 'public' && isFreeTrial;
+          return (
+            <DropdownMenuItem
+              key={visibility.id}
+              onSelect={() => handleVisibilitySelect(visibility.id)}
+              className={cn(
+                "gap-4 group/item flex flex-row justify-between items-center",
+                isDisabled && "opacity-50 cursor-not-allowed"
+              )}
+              data-active={visibility.id === visibilityType}
+            >
+              <div className="flex flex-col gap-1 items-start">
+                <div className="flex items-center gap-2">
+                  {visibility.label}
+                  {isDisabled && (
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <Lock className="h-3 w-3" />
+                      <span>Pro</span>
+                    </div>
+                  )}
+                </div>
                 <div className="text-xs text-muted-foreground">
                   {visibility.description}
                 </div>
-              )}
-            </div>
-            <div className="text-foreground dark:text-foreground opacity-0 group-data-[active=true]/item:opacity-100">
-              {visibility.id === 'private' ? <LockIcon /> : <Globe />}
-            </div>
-          </DropdownMenuItem>
-        ))}
-        {selectedVisibility?.id === 'public' && isFreeTrial && (
-          <DropdownMenuItem
-            onSelect={() => handleVisibilitySelect('public')}
-            className="flex items-center justify-between"
-          >
-            <div className="flex items-center">
-              <Lock />
-              <span>Pro</span>
-            </div>
-          </DropdownMenuItem>
-        )}
+              </div>
+              <div className="text-foreground dark:text-foreground opacity-0 group-data-[active=true]/item:opacity-100">
+                {visibility.id === 'private' ? <LockIcon /> : <Globe />}
+              </div>
+            </DropdownMenuItem>
+          );
+        })}
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -63,6 +63,7 @@ function PureChatHeader({
           <VisibilitySelector
             chatId={chatId}
             selectedVisibilityType={selectedVisibilityType}
+            isFreeTrial={isFreeTrial}
           />
           <Button
             variant="ghost"
