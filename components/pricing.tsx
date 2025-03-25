@@ -141,6 +141,21 @@ export function Pricing() {
           router.push('/chat');
           return;
         }
+        if (data.error === 'You already have an active free trial') {
+          toast({
+            type: 'success',
+            description: 'You already have an active free trial. Returning to chat...',
+          });
+          router.push('/chat');
+          return;
+        }
+        if (data.error === 'Your free trial has expired') {
+          toast({
+            type: 'error',
+            description: 'Your free trial has expired. Please upgrade to continue using all features.',
+          });
+          return;
+        }
         throw new Error(data.error || 'Failed to start free trial');
       }
 
@@ -165,6 +180,14 @@ export function Pricing() {
   return (
     <div className="min-h-screen relative isolate">
       <BackgroundBranches />
+      <Button
+        variant="ghost"
+        size="icon"
+        className="absolute top-6 right-6 z-50 rounded-full h-8 w-8 transition-all duration-200 hover:scale-105 hover:bg-gradient-to-r hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 hover:text-white"
+        onClick={() => router.push('/chat')}
+      >
+        <X className="h-4 w-4" />
+      </Button>
       <div className="py-12 sm:py-16">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-4xl text-center">
