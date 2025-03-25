@@ -119,6 +119,10 @@ export function Pricing() {
   const handleStartTrial = async () => {
     try {
       setIsLoading(true);
+      // Twitter conversion tracking event code
+      if (typeof window !== 'undefined' && (window as any).twq) {
+        (window as any).twq('event', 'tw-pcm26-pcm26', {});
+      }
       const response = await fetch('/api/free-trial/start', {
         method: 'POST',
         headers: {

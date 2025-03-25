@@ -175,6 +175,12 @@ export default function LandingPage() {
                 <Button 
                   size="lg" 
                   className="bg-gradient-to-r from-blue-500 to-purple-500 text-white transition-all px-8 py-6 text-lg rounded-2xl relative overflow-hidden group shadow-lg shadow-purple-500/20 hover:scale-105 hover:shadow-xl hover:shadow-purple-500/40"
+                  onClick={() => {
+                    // Twitter conversion tracking event code
+                    if (typeof window !== 'undefined' && (window as any).twq) {
+                      (window as any).twq('event', 'tw-pcm26-pcm26', {});
+                    }
+                  }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-200%] group-hover:animate-shine-fast" />
                   <span className="relative z-10">Start Free Trial</span>
@@ -409,9 +415,15 @@ export default function LandingPage() {
                 <Button 
                   size="lg" 
                   className="bg-gradient-to-r from-blue-500 to-purple-500 text-white transition-all px-8 py-6 text-lg rounded-2xl relative overflow-hidden group shadow-lg shadow-purple-500/20 hover:scale-105 hover:shadow-xl hover:shadow-purple-500/40"
+                  onClick={() => {
+                    // Twitter conversion tracking event code
+                    if (typeof window !== 'undefined' && (window as any).twq) {
+                      (window as any).twq('event', 'tw-pcm26-pcm26', {});
+                    }
+                  }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-200%] group-hover:animate-shine-fast" />
-                  <span className="relative z-10">Get Started Now</span>
+                  <span className="relative z-10">Start Free Trial</span>
                 </Button>
               </Link>
               <span className="text-neutral-400 text-sm mt-2">No credit card required</span>
