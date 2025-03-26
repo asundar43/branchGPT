@@ -149,7 +149,7 @@ export default function LandingPage() {
               </Button>
             </Link>
             <Link href="/auth/register">
-              <Button variant="outline" className="text-white hover:text-white/90 hover:bg-white/10 border-white/20 transition-colors">
+              <Button variant="secondary" className="text-white hover:text-white/90 hover:bg-white/10 transition-colors">
                 Sign Up
               </Button>
             </Link>
