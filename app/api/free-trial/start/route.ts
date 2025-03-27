@@ -1,6 +1,7 @@
 import { auth } from '@/app/(auth)/auth';
 import { startFreeTrial, checkFreeTrialStatus, getUser } from '@/lib/db/queries';
 import { NextResponse } from 'next/server';
+import { sendTrialStartEmail } from '@/lib/email';
 
 export async function POST(request: Request) {
   try {
@@ -38,7 +39,13 @@ export async function POST(request: Request) {
     }
 
     try {
-      await startFreeTrial(userId);
+      const result = await startFreeTrial(userId);
+      
+      // Send welcome email
+      if (result?.freeTrialEndDate) {
+        await sendTrialStartEmail(session.user.email, result.freeTrialEndDate);
+      }
+      
       return NextResponse.json({ success: true });
     } catch (error) {
       if (error instanceof Error && error.message.includes('active paid subscription')) {

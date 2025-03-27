@@ -1,4 +1,4 @@
-import type { InferSelectModel } from 'drizzle-orm';
+import { type InferSelectModel } from 'drizzle-orm';
 import {
   pgTable,
   varchar,
@@ -70,9 +70,9 @@ export const vote = pgTable(
       .references(() => message.id),
     isUpvoted: boolean('isUpvoted').notNull(),
   },
-  (table) => {
+  (t) => {
     return {
-      pk: primaryKey({ columns: [table.chatId, table.messageId] }),
+      pk: primaryKey({ columns: [t.chatId, t.messageId] }),
     };
   },
 );
@@ -93,9 +93,9 @@ export const document = pgTable(
       .notNull()
       .references(() => user.id),
   },
-  (table) => {
+  (t) => {
     return {
-      pk: primaryKey({ columns: [table.id, table.createdAt] }),
+      pk: primaryKey({ columns: [t.id, t.createdAt] }),
     };
   },
 );
