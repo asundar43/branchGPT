@@ -112,9 +112,9 @@ export default function TermsPage() {
       {/* Footer */}
       <footer className="relative z-10 mt-40 pt-12 pb-8 border-t border-white/5">
         <div className="container mx-auto px-4">
-          <div className="w-full grid grid-cols-3 gap-8">
+          <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Left side - Brand and copyright */}
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 items-center md:items-start">
               <div className="flex items-center gap-2.5">
                 <div className="text-white/80">
                   <BrandIcon size={20} />
@@ -124,13 +124,13 @@ export default function TermsPage() {
                 </span>
               </div>
               <div className="text-xs text-white/50">
-                © 2024 Stride Laboratories, Inc.
+                © 2025 Stride Laboratories, Inc.
               </div>
             </div>
 
             {/* Center - Creator credit */}
             <div className="flex flex-col items-center justify-center gap-2">
-              <div className="text-base md:text-lg font-medium text-white/90">
+              <div className="text-base md:text-lg font-medium text-white/90 text-center">
                 An Aadhav Sundar Project
               </div>
               <div className="flex items-center gap-4">
@@ -158,7 +158,7 @@ export default function TermsPage() {
             </div>
 
             {/* Right side - Links and status */}
-            <div className="flex flex-col items-end gap-4">
+            <div className="flex flex-col items-center md:items-end gap-4">
               <div className="flex items-center gap-6 text-xs text-white/40">
                 <Link href="/privacy" className="hover:text-white/90 transition-colors">
                   Privacy
