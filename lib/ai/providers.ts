@@ -6,7 +6,7 @@ import {
 } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { fireworks } from '@ai-sdk/fireworks';
-import { perplexity } from '@ai-sdk/perplexity';
+import { createPerplexity } from '@ai-sdk/perplexity';
 import { xai } from '@ai-sdk/xai';
 import { isTestEnvironment } from '../constants';
 import {
@@ -16,9 +16,16 @@ import {
   titleModel,
 } from './models.test';
 
-const perplexitySonar = perplexity('sonar') as LanguageModelV1;
-const perplexitySonarPro = perplexity('sonar-pro') as LanguageModelV1;
-const perplexitySonarDeep = perplexity('sonar-deep') as LanguageModelV1;
+// Create perplexity provider with configuration
+const perplexityProvider = createPerplexity({
+  apiKey: process.env.PERPLEXITY_API_KEY,
+  baseURL: 'https://api.perplexity.ai',
+});
+
+// Configure perplexity models
+const perplexitySonar = perplexityProvider('sonar') as LanguageModelV1;
+const perplexitySonarPro = perplexityProvider('sonar-pro') as LanguageModelV1;
+const perplexitySonarDeep = perplexityProvider('sonar-deep') as LanguageModelV1;
 const grok2 = xai('grok-2') as LanguageModelV1;
 
 export const myProvider = isTestEnvironment
