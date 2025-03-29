@@ -63,7 +63,7 @@ export const chatModels: Array<ChatModel> = [
   // Reasoning & Logic Models
   {
     id: 'chat-model-reasoning',
-    name: 'o3 Mini High',
+    name: 'o3-mini-high',
     description: 'Enhanced reasoning capabilities for logical problem-solving',
     category: 'Reasoning & Logic',
     freeTrialAvailable: true,

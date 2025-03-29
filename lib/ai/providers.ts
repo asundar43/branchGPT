@@ -18,7 +18,7 @@ import {
 
 const perplexitySonar = perplexity('sonar') as LanguageModelV1;
 const perplexitySonarPro = perplexity('sonar-pro') as LanguageModelV1;
-const perplexitySonarDeep = perplexity('sonar-deep') as LanguageModelV1;
+const perplexitySonarDeep = perplexity('sonar-deep-research') as LanguageModelV1;
 const grok2 = xai('grok-2') as LanguageModelV1;
 
 export const myProvider = isTestEnvironment
@@ -37,7 +37,7 @@ export const myProvider = isTestEnvironment
         'chat-model-large': openai('gpt-4o'),
         'chat-model-gpt45': openai('gpt-4.5-preview'),
         'chat-model-reasoning': wrapLanguageModel({
-          model: openai('o3-mini'),
+          model: openai('o3-mini-high'),
           middleware: extractReasoningMiddleware({ tagName: 'think' }),
         }),
         'chat-model-sonar': perplexitySonar,
