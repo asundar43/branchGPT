@@ -23,12 +23,13 @@ import { useLocalStorage, useWindowSize } from 'usehooks-ts';
 
 import { sanitizeUIMessages } from '@/lib/utils';
 
-import { ArrowUpIcon, PaperclipIcon, StopIcon } from './icons';
+import { ArrowUpIcon, PaperclipIcon, StopIcon, SearchIcon } from './icons';
 import { PreviewAttachment } from './preview-attachment';
 import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
 import { SuggestedActions } from './suggested-actions';
 import equal from 'fast-deep-equal';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 function PureMultimodalInput({
   chatId,
@@ -117,16 +118,27 @@ function PureMultimodalInput({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadQueue, setUploadQueue] = useState<Array<string>>([]);
 
+  const [isWebSearchEnabled, setIsWebSearchEnabled] = useState(false);
+
   const submitForm = useCallback(() => {
     window.history.replaceState({}, '', `/chat/${chatId}`);
 
+    // Add web search instruction if enabled
+    const messageToSend = isWebSearchEnabled 
+      ? `${input}\n\n[do a web search]`
+      : input;
+
     handleSubmit(undefined, {
       experimental_attachments: attachments,
+      data: {
+        message: messageToSend,
+      },
     });
 
     setAttachments([]);
     setLocalStorageInput('');
     resetHeight();
+    setIsWebSearchEnabled(false);
 
     if (width && width > 768) {
       textareaRef.current?.focus();
@@ -138,6 +150,8 @@ function PureMultimodalInput({
     setLocalStorageInput,
     width,
     chatId,
+    input,
+    isWebSearchEnabled,
   ]);
 
   const uploadFile = async (file: File) => {
@@ -262,8 +276,32 @@ function PureMultimodalInput({
         }}
       />
 
-      <div className="absolute bottom-0 p-2 w-fit flex flex-row justify-start">
+      <div className="absolute bottom-0 p-2 w-fit flex flex-row justify-start gap-2">
         <AttachmentsButton fileInputRef={fileInputRef} isLoading={isLoading} />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              data-testid="web-search-button"
+              className={cx(
+                "rounded-md rounded-bl-lg p-[7px] h-fit dark:border-zinc-700 hover:dark:bg-zinc-900 hover:bg-zinc-200",
+                {
+                  "bg-primary text-primary-foreground": isWebSearchEnabled,
+                }
+              )}
+              onClick={(event) => {
+                event.preventDefault();
+                setIsWebSearchEnabled(!isWebSearchEnabled);
+              }}
+              disabled={isLoading}
+              variant="ghost"
+            >
+              <SearchIcon size={14} />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            {isWebSearchEnabled ? "Disable web search" : "Enable web search"}
+          </TooltipContent>
+        </Tooltip>
       </div>
 
       <div className="absolute bottom-0 right-0 p-2 w-fit flex flex-row justify-end">
