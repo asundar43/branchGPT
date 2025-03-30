@@ -25,7 +25,7 @@ const perplexityProvider = createPerplexity({
 // Configure perplexity models
 const perplexitySonar = perplexityProvider('sonar') as LanguageModelV1;
 const perplexitySonarPro = perplexityProvider('sonar-pro') as LanguageModelV1;
-const perplexitySonarDeep = perplexityProvider('sonar-deep') as LanguageModelV1;
+const perplexitySonarDeep = perplexityProvider('sonar-deep-research') as LanguageModelV1;
 const grok2 = xai('grok-2') as LanguageModelV1;
 
 export const myProvider = isTestEnvironment
