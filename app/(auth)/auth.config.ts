@@ -44,8 +44,8 @@ export const authConfig = {
       // Allow access to auth pages for non-logged-in users
       if (isOnAuth) return true;
 
-      // Protect dashboard routes
-      if (isOnDashboard) {
+      // Protect dashboard and pricing routes
+      if (isOnDashboard || isOnPricing) {
         if (!isLoggedIn || !auth?.user?.id) {
           return Response.redirect(new URL('/auth/login', nextUrl));
         }
@@ -64,11 +64,6 @@ export const authConfig = {
           console.error('Error checking subscription:', error);
           return Response.redirect(new URL('/pricing', nextUrl));
         }
-      }
-
-      // Allow access to pricing page for everyone
-      if (isOnPricing) {
-        return true;
       }
 
       return false;
