@@ -1,1 +1,0 @@
-ALTER TABLE "subscriptions" ALTER COLUMN "status" SET DATA TYPE varchar;
