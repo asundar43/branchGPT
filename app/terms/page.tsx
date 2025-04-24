@@ -80,7 +80,7 @@ export default function TermsPage() {
             <section>
               <h2 className="text-2xl font-semibold mb-4 text-white/80">Intellectual Property</h2>
               <p className="mb-4">
-                The Service and its original content, features, and functionality are owned by Stride Laboratories, Inc. and are protected by international copyright, trademark, and other intellectual property laws.
+                The Service and its original content, features, and functionality are owned by <a href="https://auralistechnologies.vercel.app" target="_blank" rel="noopener noreferrer">Auralis Technologies, LLC</a> and are protected by international copyright, trademark, and other intellectual property laws.
               </p>
             </section>
 
@@ -94,7 +94,7 @@ export default function TermsPage() {
             <section>
               <h2 className="text-2xl font-semibold mb-4 text-white/80">Limitation of Liability</h2>
               <p className="mb-4">
-                BranchGPT and/or Stride Laboratories, Inc. shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of or inability to use the Service.
+                BranchGPT and/or <a href="https://auralistechnologies.vercel.app" target="_blank" rel="noopener noreferrer">Auralis Technologies, LLC</a> shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of or inability to use the Service.
               </p>
             </section>
 
@@ -124,7 +124,7 @@ export default function TermsPage() {
                 </span>
               </div>
               <div className="text-xs text-white/50">
-                © 2025 Stride Laboratories, Inc.
+                &copy; 2025 <a href="https://auralistechnologies.vercel.app" target="_blank" rel="noopener noreferrer">Auralis Technologies, LLC</a>
               </div>
             </div>
 
@@ -166,7 +166,7 @@ export default function TermsPage() {
                 <Link href="/terms" className="hover:text-white/90 transition-colors">
                   Terms
                 </Link>
-                <a href="mailto:aadhav@stride-labs.com" className="hover:text-white/90 transition-colors">
+                <a href="mailto:aadhav@auralistechnologies.com" className="hover:text-white/90 transition-colors">
                   Contact
                 </a>
               </div>

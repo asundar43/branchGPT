@@ -447,7 +447,7 @@ export default function LandingPage() {
                 </span>
               </div>
               <div className="text-xs text-white/50">
-                © 2025 Stride Laboratories, Inc.
+                &copy; 2025 <a href="https://auralistechnologies.vercel.app" target="_blank" rel="noopener noreferrer">Auralis Technologies, LLC</a>
               </div>
             </div>
 
@@ -489,7 +489,7 @@ export default function LandingPage() {
                 <Link href="/terms" className="hover:text-white/90 transition-colors">
                   Terms
                 </Link>
-                <a href="mailto:aadhav@stride-labs.com" className="hover:text-white/90 transition-colors">
+                <a href="mailto:aadhav@auralistechnologies.com" className="hover:text-white/90 transition-colors">
                   Contact
                 </a>
               </div>

@@ -96,7 +96,7 @@ export default function PrivacyPage() {
               <p className="mb-4">
                 If you have any questions about this Privacy Policy, please contact us at:
               </p>
-              <p className="text-white/80">aadhav@stride-labs.com</p>
+              <p className="text-white/80">sundar.aadhav5@gmail.com</p>
             </section>
 
             <section>
@@ -125,7 +125,7 @@ export default function PrivacyPage() {
                 </span>
               </div>
               <div className="text-xs text-white/50">
-                © 2025 Stride Laboratories, Inc.
+                &copy; 2025 <a href="https://auralistechnologies.vercel.app" target="_blank" rel="noopener noreferrer">Auralis Technologies, LLC</a>
               </div>
             </div>
 
@@ -167,7 +167,7 @@ export default function PrivacyPage() {
                 <Link href="/terms" className="hover:text-white/90 transition-colors">
                   Terms
                 </Link>
-                <a href="mailto:aadhav@stride-labs.com" className="hover:text-white/90 transition-colors">
+                <a href="mailto:aadhav@auralistechnologies.com" className="hover:text-white/90 transition-colors">
                   Contact
                 </a>
               </div>
