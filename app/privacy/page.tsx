@@ -125,7 +125,7 @@ export default function PrivacyPage() {
                 </span>
               </div>
               <div className="text-xs text-white/50">
-                &copy; 2025 <a href="https://auralistechnologies.vercel.app" target="_blank" rel="noopener noreferrer">Auralis Technologies, LLC</a>
+                &copy; 2025 <a href="https://www.auralis.one" target="_blank" rel="noopener noreferrer">Auralis Technologies, LLC</a>
               </div>
             </div>
 

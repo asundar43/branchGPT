@@ -447,7 +447,7 @@ export default function LandingPage() {
                 </span>
               </div>
               <div className="text-xs text-white/50">
-                &copy; 2025 <a href="https://auralistechnologies.vercel.app" target="_blank" rel="noopener noreferrer">Auralis Technologies, LLC</a>
+                &copy; 2025 <a href="https://www.auralis.one" target="_blank" rel="noopener noreferrer">Auralis Technologies, LLC</a>
               </div>
             </div>
 
@@ -483,13 +483,13 @@ export default function LandingPage() {
             {/* Right side - Links and status */}
             <div className="flex flex-col items-center md:items-end gap-4">
               <div className="flex items-center gap-6 text-xs text-white/40">
-                <Link href="/privacy" className="hover:text-white/90 transition-colors">
+                <Link href="https://www.auralis.one/privacy" target="_blank" className="hover:text-white/90 transition-colors">
                   Privacy
                 </Link>
-                <Link href="/terms" className="hover:text-white/90 transition-colors">
+                <Link href="https://www.auralis.one/terms" target="_blank" className="hover:text-white/90 transition-colors">
                   Terms
                 </Link>
-                <a href="mailto:aadhav@auralistechnologies.com" className="hover:text-white/90 transition-colors">
+                <a href="mailto:aadhav@auralis.one" target="_blank" className="hover:text-white/90 transition-colors">
                   Contact
                 </a>
               </div>
