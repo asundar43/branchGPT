@@ -41,19 +41,22 @@ const tiers = [
   {
     name: 'Monthly',
     id: 'monthly',
-    price: { monthly: '$20' },
+    price: { monthly: '$10', original: '$20' },
     priceId: process.env.NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID,
     description: 'Full access to BranchGPT',
     features,
+    discount: '50% OFF',
+    originalAnnual: '$20',
   },
   {
     name: 'Annual',
     id: 'annual',
-    price: { monthly: '$16', annual: '$192' },
+    price: { monthly: '$8', annual: '$96', originalMonthly: '$16', originalAnnual: '$192' },
     priceId: process.env.NEXT_PUBLIC_STRIPE_ANNUAL_PRICE_ID,
     description: 'Best value for power users',
     features,
     isPopular: true,
+    discount: '50% OFF',
   },
 ];
 
@@ -254,18 +257,51 @@ export function Pricing() {
                   </div>
                   <CardDescription>{tier.description}</CardDescription>
                   <div className="mt-4 flex flex-col">
-                    <div className="flex items-baseline">
-                      <span className="text-4xl font-bold tracking-tight">
-                        {tier.price.monthly}
-                      </span>
-                      <span className="ml-1 text-sm font-semibold leading-6 text-muted-foreground">
-                        /month
-                      </span>
-                    </div>
+                    {tier.id !== 'annual' && (
+                      <div className="flex items-baseline gap-2">
+                        {tier.price.original && (
+                          <span className="text-lg font-semibold text-muted-foreground line-through">
+                            {tier.price.original}
+                          </span>
+                        )}
+                        <span className="text-4xl font-bold tracking-tight">
+                          {tier.price.monthly}
+                        </span>
+                        <span className="ml-1 text-sm font-semibold leading-6 text-muted-foreground">
+                          /month
+                        </span>
+                      </div>
+                    )}
                     {tier.id === 'annual' && (
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        {isAnnual ? 'Billed annually at $192' : 'Switch to annual to save 20%'}
-                      </p>
+                      <>
+                        <div className="flex items-baseline gap-2 mt-1">
+                          <span className="text-lg font-semibold text-muted-foreground line-through">
+                            {tier.price.originalMonthly}
+                          </span>
+                          <span className="text-4xl font-bold tracking-tight">
+                            {tier.price.monthly}
+                          </span>
+                          <span className="ml-1 text-sm font-semibold leading-6 text-muted-foreground">
+                            /month
+                          </span>
+                        </div>
+                        <div className="flex items-baseline gap-2 mt-1">
+                          <span className="text-base font-semibold text-muted-foreground line-through">
+                            {tier.price.originalAnnual}
+                          </span>
+                          <span className="text-base font-semibold text-muted-foreground">
+                            {tier.price.annual}
+                          </span>
+                          <span className="ml-1 text-xs font-semibold leading-6 text-muted-foreground">
+                            billed yearly
+                          </span>
+                        </div>
+                      </>
+                    )}
+                    {tier.discount && (
+                      <span className="inline-flex items-center rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 px-2.5 py-0.5 text-xs font-bold text-white mt-2">
+                        {tier.discount}
+                      </span>
                     )}
                   </div>
                 </CardHeader>
