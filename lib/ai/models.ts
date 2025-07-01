@@ -1,4 +1,4 @@
-export const DEFAULT_CHAT_MODEL: string = 'chat-model-small';
+export const DEFAULT_CHAT_MODEL: string = 'chat-model-gpt41';
 
 interface ChatModel {
   id: string;
@@ -12,28 +12,12 @@ interface ChatModel {
 export const chatModels: Array<ChatModel> = [
   // General Purpose Models
   {
-    id: 'chat-model-small',
-    name: 'GPT-4o Mini',
-    description: 'Fast and efficient for everyday tasks and quick responses',
-    category: 'General Purpose',
-    freeTrialAvailable: true,
-    isPremium: false,
-  },
-  {
-    id: 'chat-model-large',
-    name: 'GPT-4o',
+    id: 'chat-model-gpt41',
+    name: 'GPT-4.1',
     description: 'Most capable model for complex tasks and detailed analysis',
     category: 'General Purpose',
     freeTrialAvailable: true,
     isPremium: false,
-  },
-  {
-    id: 'chat-model-gpt45',
-    name: 'GPT-4.5 Preview',
-    description: 'Enhanced capabilities with improved performance and reasoning',
-    category: 'General Purpose',
-    freeTrialAvailable: false,
-    isPremium: true,
   },
   // Research & Analysis Models
   {
@@ -41,8 +25,8 @@ export const chatModels: Array<ChatModel> = [
     name: 'Sonar',
     description: 'Balanced performance for research and analysis',
     category: 'Research & Analysis',
-    freeTrialAvailable: false,
-    isPremium: true,
+    freeTrialAvailable: true,
+    isPremium: false,
   },
   {
     id: 'chat-model-sonar-pro',
@@ -52,27 +36,19 @@ export const chatModels: Array<ChatModel> = [
     freeTrialAvailable: false,
     isPremium: true,
   },
+  // Reasoning & Logic Models
   {
-    id: 'chat-model-sonar-deep',
-    name: 'Sonar Deep Research',
-    description: 'Specialized for in-depth research and comprehensive analysis',
-    category: 'Research & Analysis',
+    id: 'chat-model-o4-mini',
+    name: 'o4-mini',
+    description: 'Efficient reasoning model for logical problem-solving',
+    category: 'Reasoning & Logic',
     freeTrialAvailable: false,
     isPremium: true,
   },
-  // Reasoning & Logic Models
   {
-    id: 'chat-model-reasoning',
-    name: 'o3-mini-high',
-    description: 'Enhanced reasoning capabilities for logical problem-solving',
-    category: 'Reasoning & Logic',
-    freeTrialAvailable: true,
-    isPremium: false,
-  },
-  {
-    id: 'chat-model-grok2',
-    name: 'Grok 2',
-    description: 'Advanced reasoning and analytical capabilities for complex problem-solving',
+    id: 'chat-model-o3',
+    name: 'o3',
+    description: 'Classic reasoning model for logical problem-solving',
     category: 'Reasoning & Logic',
     freeTrialAvailable: false,
     isPremium: true,

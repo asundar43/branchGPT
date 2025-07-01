@@ -167,7 +167,7 @@ export async function POST(request: Request) {
           messages,
           maxSteps: 5,
           experimental_activeTools:
-            selectedChatModel === 'chat-model-reasoning'
+            selectedChatModel === 'chat-model-o4-mini' || selectedChatModel === 'chat-model-o3'
               ? []
               : [
                   'getWeather',

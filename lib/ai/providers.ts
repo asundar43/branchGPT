@@ -16,41 +16,60 @@ import {
   titleModel,
 } from './models.test';
 
-// Create perplexity provider with configuration
+// Create providers with configuration
 const perplexityProvider = createPerplexity({
   apiKey: process.env.PERPLEXITY_API_KEY,
   baseURL: 'https://api.perplexity.ai',
 });
 
-// Configure perplexity models
-const perplexitySonar = perplexityProvider('sonar') as LanguageModelV1;
-const perplexitySonarPro = perplexityProvider('sonar-pro') as LanguageModelV1;
-const perplexitySonarDeep = perplexityProvider('sonar-deep-research') as LanguageModelV1;
-const grok2 = xai('grok-2') as LanguageModelV1;
+// Configure perplexity models with middleware to fix context switching issues
+const perplexitySonar = wrapLanguageModel({
+  model: perplexityProvider('sonar') as LanguageModelV1,
+  middleware: {
+    transformParams: async ({ params }) => {
+      // Remove logprobs parameters that cause conflicts with Perplexity API
+      // when switching from OpenAI models
+      const { logprobs, top_logprobs, ...cleanParams } = params as any;
+      return cleanParams;
+    },
+  },
+});
+
+const perplexitySonarPro = wrapLanguageModel({
+  model: perplexityProvider('sonar-pro') as LanguageModelV1,
+  middleware: {
+    transformParams: async ({ params }) => {
+      // Remove logprobs parameters that cause conflicts with Perplexity API
+      // when switching from OpenAI models
+      const { logprobs, top_logprobs, ...cleanParams } = params as any;
+      return cleanParams;
+    },
+  },
+});
 
 export const myProvider = isTestEnvironment
   ? customProvider({
       languageModels: {
-        'chat-model-small': chatModel,
-        'chat-model-large': chatModel,
-        'chat-model-reasoning': reasoningModel,
+        'chat-model-gpt41': chatModel,
+        'chat-model-o4-mini': reasoningModel,
+        'chat-model-o3': reasoningModel,
         'title-model': titleModel,
         'artifact-model': artifactModel,
       },
     })
   : customProvider({
       languageModels: {
-        'chat-model-small': openai('gpt-4o-mini'),
-        'chat-model-large': openai('gpt-4o'),
-        'chat-model-gpt45': openai('gpt-4.5-preview'),
-        'chat-model-reasoning': wrapLanguageModel({
+        'chat-model-gpt41': openai('gpt-4-1106-preview'),
+        'chat-model-o4-mini': wrapLanguageModel({
+          model: openai('o1-mini'),
+          middleware: extractReasoningMiddleware({ tagName: 'think' }),
+        }),
+        'chat-model-o3': wrapLanguageModel({
           model: openai('o3-mini'),
           middleware: extractReasoningMiddleware({ tagName: 'think' }),
         }),
         'chat-model-sonar': perplexitySonar,
         'chat-model-sonar-pro': perplexitySonarPro,
-        'chat-model-sonar-deep': perplexitySonarDeep,
-        'chat-model-grok2': grok2,
         'title-model': openai('gpt-4o-mini'),
         'artifact-model': openai('gpt-4o-mini'),
       },

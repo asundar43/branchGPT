@@ -480,7 +480,7 @@ export async function incrementChatCount(userId: string) {
 export async function isAllowedModel(model: string, userId?: string): Promise<boolean> {
   // If no userId provided, only allow free trial models
   if (!userId) {
-    const freeTrialModels = ['chat-model-small', 'chat-model-large', 'chat-model-reasoning'];
+    const freeTrialModels = ['chat-model-gpt41', 'chat-model-sonar'];
     return freeTrialModels.includes(model);
   }
 
@@ -493,6 +493,6 @@ export async function isAllowedModel(model: string, userId?: string): Promise<bo
   }
 
   // For users without subscription, only allow free trial models
-  const freeTrialModels = ['chat-model-small', 'chat-model-large', 'chat-model-reasoning'];
+  const freeTrialModels = ['chat-model-gpt41', 'chat-model-sonar'];
   return freeTrialModels.includes(model);
 }
