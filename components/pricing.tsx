@@ -237,7 +237,7 @@ export function Pricing() {
               BranchGPT is FREE for 4 Days
             </h2>
             <p className="text-sm opacity-90 mb-4 max-w-2xl mx-auto">
-              They stole our ideas, so we're giving them away • Unlimited everything • Zero cost
+              They stole our ideas, so we&apos;re giving them away • Unlimited everything • Zero cost
             </p>
             <Button 
               onClick={() => router.push('/chat')} 

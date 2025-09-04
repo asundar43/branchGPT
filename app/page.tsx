@@ -210,7 +210,7 @@ export default function LandingPage() {
               BranchGPT is FREE for 4 Days
             </h2>
             <p className="text-sm opacity-90 mb-4 max-w-2xl mx-auto">
-              They stole our ideas, so we're giving them away • Unlimited everything • Zero cost
+              They stole our ideas, so we&apos;re giving them away • Unlimited everything • Zero cost
             </p>
             <Link href="/auth/register">
               <Button className="bg-white text-indigo-600 hover:bg-gray-100 font-semibold px-6 py-2 rounded-full shadow-lg hover:scale-105 transition-all relative overflow-hidden group">
