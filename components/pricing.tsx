@@ -3,12 +3,13 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Check, X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { useSession } from 'next-auth/react';
 import { BackgroundBranches } from './background-branches';
 import { useRouter } from 'next/navigation';
 import { toast } from '@/components/toast';
+import { isInFreePeriod, FREE_PERIOD_END_DATE } from '@/lib/constants';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -64,10 +65,19 @@ export function Pricing() {
   const { data: session, status } = useSession();
   const [isAnnual, setIsAnnual] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [showFreePeriodBanner, setShowFreePeriodBanner] = useState(false);
+  const [daysRemaining, setDaysRemaining] = useState(0);
   const router = useRouter();
 
   // Add loading state for session
   const isSessionLoading = status === 'loading';
+
+  useEffect(() => {
+    if (isInFreePeriod()) {
+      setShowFreePeriodBanner(true);
+      setDaysRemaining(4); // Always show 4 days for maximum urgency 😈
+    }
+  }, []);
 
   const handleSubscribe = async (priceId: string) => {
     if (!session?.user?.id) {
@@ -183,6 +193,63 @@ export function Pricing() {
   return (
     <div className="min-h-screen relative isolate">
       <BackgroundBranches />
+      
+      {/* FREE PERIOD BANNER */}
+      {showFreePeriodBanner && (
+        <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white py-6 px-6 text-center relative z-40 border-b border-white/10 overflow-hidden">
+          {/* Subtle branching pattern background */}
+          <div className="absolute inset-0 opacity-10">
+            <svg className="w-full h-full" viewBox="0 0 100 20" preserveAspectRatio="xMidYMid slice">
+              <path 
+                className="stroke-white/30 stroke-[0.5]" 
+                d="M10,10 L30,10 Q35,10 35,15 L35,18" 
+                fill="none" 
+                strokeLinecap="round"
+              />
+              <path 
+                className="stroke-white/30 stroke-[0.5]" 
+                d="M10,10 L30,10 Q35,10 35,5 L35,2" 
+                fill="none" 
+                strokeLinecap="round"
+              />
+              <path 
+                className="stroke-white/30 stroke-[0.5]" 
+                d="M70,10 L50,10 Q45,10 45,15 L45,18" 
+                fill="none" 
+                strokeLinecap="round"
+              />
+              <path 
+                className="stroke-white/30 stroke-[0.5]" 
+                d="M70,10 L50,10 Q45,10 45,5 L45,2" 
+                fill="none" 
+                strokeLinecap="round"
+              />
+            </svg>
+          </div>
+          
+          <div className="max-w-4xl mx-auto relative">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <div className="w-2 h-2 rounded-full bg-white/80 animate-pulse" />
+              <span className="text-xs font-mono uppercase tracking-wider text-white/80">F*CK OPENAI SALE</span>
+              <div className="w-2 h-2 rounded-full bg-white/80 animate-pulse" />
+            </div>
+            <h2 className="text-2xl font-bold mb-2 bg-gradient-to-r from-white via-white to-white/90 bg-clip-text text-transparent">
+              BranchGPT is FREE for 4 Days
+            </h2>
+            <p className="text-sm opacity-90 mb-4 max-w-2xl mx-auto">
+              They stole our ideas, so we're giving them away • Unlimited everything • Zero cost
+            </p>
+            <Button 
+              onClick={() => router.push('/chat')} 
+              className="bg-white text-indigo-600 hover:bg-gray-100 font-semibold px-6 py-2 rounded-full shadow-lg hover:scale-105 transition-all relative overflow-hidden group"
+            >
+              <span className="relative z-10">Steal This FREE →</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:animate-shine-fast" />
+            </Button>
+          </div>
+        </div>
+      )}
+      
       <Button
         variant="ghost"
         size="icon"

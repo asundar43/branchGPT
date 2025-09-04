@@ -361,6 +361,12 @@ export async function updateChatVisiblityById({
 
 export async function hasActiveSubscription(userId: string): Promise<boolean> {
   try {
+    // Check if we're in the free period - if so, everyone gets free access!
+    const { isInFreePeriod } = await import('@/lib/constants');
+    if (isInFreePeriod()) {
+      return true;
+    }
+
     const [subscription] = await db
       .select()
       .from(subscriptions)
@@ -419,6 +425,16 @@ export async function checkFreeTrialStatus(userId: string): Promise<{
   chatsRemaining: number;
 }> {
   try {
+    // Check if we're in the free period - if so, everyone gets unlimited access!
+    const { isInFreePeriod } = await import('@/lib/constants');
+    if (isInFreePeriod()) {
+      return { 
+        isActive: true, 
+        daysRemaining: 4, // Always show 4 days for maximum urgency 😈
+        chatsRemaining: 999 // Unlimited chats during free period
+      };
+    }
+
     const [userData] = await db
       .select({
         freeTrialStartDate: user.freeTrialStartDate,
